@@ -4,7 +4,9 @@ import me.despical.commandframework.CommandArguments;
 import me.despical.commandframework.annotations.Command;
 import me.despical.ewduels.arena.Arena;
 import me.despical.ewduels.user.User;
+import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,6 +18,24 @@ import java.util.stream.Collectors;
 public class ArenaCommands extends AbstractCommandHandler {
 
     // TODO - Move command messages to messages.yml
+
+
+    @Command(
+        name = "test"
+    )
+    public void test(CommandArguments arguments) {
+        var itemManager = plugin.getItemManager();
+        var items = List.of("lobby", "end", "first-player", "second-player", "first-egg", "second-egg", "save-and-exit");
+        Player player = arguments.getSender();
+        var inventory = player.getInventory();
+
+        for (var specialItem : items) {
+            var item = itemManager.getItem(specialItem);
+            int slot = item.<Integer>getCustomKey("slot");
+
+            inventory.setItem(slot, item.getItemStack());
+        }
+    }
 
     @Command(
         name = "ew.create",

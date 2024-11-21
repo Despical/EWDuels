@@ -1,0 +1,29 @@
+items:
+  lobby:
+    name: "&aSet Lobby Location"
+    material: CLOCK
+    slot: 0
+  end:
+    name: "&aSet End Location"
+    material: COMPASS
+    slot: 1
+  first-player:
+    name: "&eSet First Player's Location"
+    material: GOLD_BLOCK
+    slot: 2
+  second-player:
+    name: "&eSet Second Player's Location"
+    material: IRON_BLOCK
+    slot: 3
+  first-egg:
+    name: "&bSet First Egg's Location"
+    material: DRAGON_EGG
+    slot: 5
+  second-egg:
+    name: "&bSet Second Egg's Location"
+    material: DRAGON_EGG
+    slot: 6
+  save-and-exit:
+    name: "&cSave and Exit"
+    material: RED_WOOL
+    slot: 8

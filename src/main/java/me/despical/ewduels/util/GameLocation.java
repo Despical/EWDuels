@@ -1,0 +1,26 @@
+package me.despical.ewduels.util;
+
+/**
+ * @author Despical
+ * <p>
+ * Created at 21.11.2024
+ */
+public enum GameLocation {
+
+    LOBBY("lobby"),
+    END("end"),
+    FIRST_PLAYER("firstPlayer"),
+    SECOND_PLAYER("secondPlayer"),
+    FIRST_EGG("firstEgg"),
+    SECOND_EGG("secondEgg"),;
+
+    private final String name;
+
+    GameLocation(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
