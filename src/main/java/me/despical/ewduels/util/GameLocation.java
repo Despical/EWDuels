@@ -1,5 +1,9 @@
 package me.despical.ewduels.util;
 
+import me.despical.commons.string.StringUtils;
+
+import java.util.Locale;
+
 /**
  * @author Despical
  * <p>
@@ -9,10 +13,10 @@ public enum GameLocation {
 
     LOBBY("lobby"),
     END("end"),
-    FIRST_PLAYER("firstPlayer"),
-    SECOND_PLAYER("secondPlayer"),
-    FIRST_EGG("firstEgg"),
-    SECOND_EGG("secondEgg"),;
+    FIRST_PLAYER("first-player"),
+    SECOND_PLAYER("second-player"),
+    FIRST_EGG("first-egg"),
+    SECOND_EGG("second-egg");
 
     private final String name;
 
@@ -22,5 +26,9 @@ public enum GameLocation {
 
     public String getName() {
         return name;
+    }
+
+    public String getFormattedName() {
+        return StringUtils.capitalize(name().toLowerCase(Locale.ENGLISH).replace("_", " "), ' ');
     }
 }

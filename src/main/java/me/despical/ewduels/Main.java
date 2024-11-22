@@ -37,10 +37,15 @@ public class Main extends JavaPlugin {
         itemManager.registerItemsFromResources("setup-items.yml", "items");
         commandFramework = new CommandFramework(this);
 
-        new GeneralEvents(this);
+        new GeneralEvents();
 
         new PlayerCommands();
         new ArenaCommands();
+    }
+
+    @Override
+    public void onDisable() {
+        arenaRegistry.saveData();
     }
 
     public ArenaRegistry getArenaRegistry() {

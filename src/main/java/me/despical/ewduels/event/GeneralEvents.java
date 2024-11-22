@@ -1,6 +1,5 @@
 package me.despical.ewduels.event;
 
-import me.despical.ewduels.Main;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -14,10 +13,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
  * Created at 21.11.2024
  */
 public class GeneralEvents extends AbstractEventHandler {
-
-    public GeneralEvents(Main plugin) {
-        super(plugin);
-    }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event) {

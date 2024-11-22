@@ -4,9 +4,7 @@ import me.despical.commandframework.CommandArguments;
 import me.despical.commandframework.annotations.Command;
 import me.despical.ewduels.arena.Arena;
 import me.despical.ewduels.user.User;
-import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,26 +14,6 @@ import java.util.stream.Collectors;
  * Created at 21.11.2024
  */
 public class ArenaCommands extends AbstractCommandHandler {
-
-    // TODO - Move command messages to messages.yml
-
-
-    @Command(
-        name = "test"
-    )
-    public void test(CommandArguments arguments) {
-        var itemManager = plugin.getItemManager();
-        var items = List.of("lobby", "end", "first-player", "second-player", "first-egg", "second-egg", "save-and-exit");
-        Player player = arguments.getSender();
-        var inventory = player.getInventory();
-
-        for (var specialItem : items) {
-            var item = itemManager.getItem(specialItem);
-            int slot = item.<Integer>getCustomKey("slot");
-
-            inventory.setItem(slot, item.getItemStack());
-        }
-    }
 
     @Command(
         name = "ew.create",
@@ -49,20 +27,21 @@ public class ArenaCommands extends AbstractCommandHandler {
         String id = arguments.getArgument(0);
 
         if (plugin.getArenaRegistry().isArena(id)) {
-            user.sendRawMessage("arena is already created");
+            user.sendMessage("admin-commands.arena-already-created");
             return;
         }
 
-        plugin.getArenaRegistry().createArena(id);
+        Arena arena = plugin.getArenaRegistry().registerNewArena(id);
+        arena.createSetupSeason(user);
 
-        user.sendRawMessage("new arena instance created: " + id);
+        user.sendFormattedMessage("admin-commands.created-new-arena", id);
     }
 
     @Command(
         name = "ew.delete",
         permission = "ew.delete",
         usage = "/ew delete <arena_name>",
-        desc = "Deletes the arena instance with the given ID, if it exists.",
+        desc = "Deletes the arena instance with the given ID.",
         min = 1,
         senderType = Command.SenderType.PLAYER
     )
@@ -70,13 +49,13 @@ public class ArenaCommands extends AbstractCommandHandler {
         String id = arguments.getArgument(0);
 
         if (!plugin.getArenaRegistry().isArena(id)) {
-            user.sendRawMessage("no arena is created");
+            user.sendFormattedMessage("admin-commands.no-arena-like-that", id);
             return;
         }
 
-        plugin.getArenaRegistry().deleteArena(id);
+        plugin.getArenaRegistry().unregisterArena(id);
 
-        user.sendRawMessage("arena instance successfully deleted");
+        user.sendFormattedMessage("admin-commands.deleted-arena", id);
     }
 
     @Command(
@@ -90,12 +69,38 @@ public class ArenaCommands extends AbstractCommandHandler {
         Set<Arena> arenas = plugin.getArenaRegistry().getArenas();
 
         if (arenas.isEmpty()) {
-            user.sendRawMessage("no arenas created");
+            user.sendMessage("admin-commands.no-arenas-created");
             return;
         }
 
-        String list = arenas.stream().map(Arena::getId).collect(Collectors.joining(", "));
+        String list = arenas.stream()
+            .map(Arena::getId)
+            .collect(Collectors.joining(", "));
 
-        user.sendRawMessage("arena list: " + list);
+        user.sendFormattedMessage("admin-commands.arena-list", list);
+    }
+
+    @Command(
+        name = "ew.edit",
+        permission = "ew.edit",
+        usage = "/ew edit <arena_name>",
+        desc = "Gives the editor tools.",
+        senderType = Command.SenderType.PLAYER
+    )
+    public void edit(CommandArguments arguments, User user) {
+        String id = arguments.getArgument(0);
+        Arena arena = plugin.getArenaRegistry().getArena(id);
+
+        if (arena == null) {
+            user.sendFormattedMessage("admin-commands.no-arena-like-that", id);
+            return;
+        }
+
+        if (arena.isSetupMode()) {
+            user.sendMessage("admin-commands.can-not-edit-now");
+            return;
+        }
+
+        arena.createSetupSeason(user);
     }
 }

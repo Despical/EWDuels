@@ -16,12 +16,11 @@ import java.util.*;
 public class Arena {
 
     private static final Main plugin = Main.getPlugin(Main.class);
-
-    private SetupMode setupMode;
-
     private final String id;
     private final Set<User> players;
     private final Map<GameLocation, Location> locations;
+    private boolean ready;
+    private SetupMode setupMode;
 
     Arena(String id) {
         this.id = id;
@@ -31,6 +30,14 @@ public class Arena {
 
     public String getId() {
         return id;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
     }
 
     public void addPlayer(User user) {
@@ -53,8 +60,17 @@ public class Arena {
         return locations.get(gameLocation);
     }
 
-    public void setSetupMode(SetupMode setupMode) {
-        this.setupMode = setupMode;
+    public void createSetupSeason(User user) {
+        if (setupMode != null) {
+            throw new IllegalStateException("Someone has already been set upping the arena!");
+        }
+
+        this.setupMode = new SetupMode(plugin, this, user);
+    }
+
+    public void endSetupSeason(boolean delete) {
+        setupMode.exitSetup(delete);
+        setupMode = null;
     }
 
     public boolean isSetupMode() {

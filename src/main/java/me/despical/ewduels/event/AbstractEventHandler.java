@@ -10,11 +10,9 @@ import org.bukkit.event.Listener;
  */
 public abstract class AbstractEventHandler implements Listener {
 
-    protected final Main plugin;
+    protected static final Main plugin = Main.getPlugin(Main.class);
 
-    public AbstractEventHandler(Main plugin) {
-        this.plugin = plugin;
-
+    public AbstractEventHandler() {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 }

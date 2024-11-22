@@ -1,0 +1,15 @@
+admin-commands:
+  correct-usage: "&cCorrect usage: {0}"
+  created-new-arena: "&aNew arena instance &7({0})&a created."
+  deleted-arena: "&aDeleted the arena instance &7({0})&a successfully."
+  arena-already-created: "&cThere is already an arena with the given ID!"
+  no-arena-like-that: "&cThere is no arena with the given ID!"
+  no-arenas-created: "&cThere is no arenas created yet!"
+  arena-list: "&aRegistered arenas: &7{0}"
+  can-not-edit-now: "&cSomeone has already been editing this arena at the moment!"
+
+setup:
+  exiting: "&aExiting the setup mode."
+  missing-location: "&cArena could not be registered due to missing some of the game locations ({0})."
+  location-set: "&a{0} location set."
+  arena-deleted: "&aExiting the setup mode because the arena is deleted."

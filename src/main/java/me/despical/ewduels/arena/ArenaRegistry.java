@@ -1,8 +1,11 @@
 package me.despical.ewduels.arena;
 
 import me.despical.commons.configuration.ConfigUtils;
+import me.despical.commons.serializer.LocationSerializer;
 import me.despical.ewduels.Main;
 import me.despical.ewduels.user.User;
+import me.despical.ewduels.util.GameLocation;
+import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -17,10 +20,12 @@ import java.util.Set;
  */
 public class ArenaRegistry {
 
+    private final Main plugin;
     private final FileConfiguration config;
     private final Map<String, Arena> arenas;
 
     public ArenaRegistry(Main plugin) {
+        this.plugin = plugin;
         this.config = ConfigUtils.getConfig(plugin, "arena");
         this.arenas = new HashMap<>();
 
@@ -53,18 +58,29 @@ public class ArenaRegistry {
         return Set.copyOf(arenas.values());
     }
 
-    public void createArena(String id) {
+    public Arena registerNewArena(String id) {
         Arena arena = new Arena(id);
 
         saveData(arena);
 
         arenas.put(id, arena);
+        return arena;
     }
 
-    public void deleteArena(String id) {
+    public void unregisterArena(String id) {
+        Arena arena = arenas.get(id);
+
+        if (arena.isSetupMode()) {
+            arena.endSetupSeason(true);
+        }
+
         config.set("arenas." + id, null);
 
         arenas.remove(id);
+    }
+
+    public void saveData() {
+        ConfigUtils.saveConfig(plugin, config, "arena");
     }
 
     private void loadArenas() {
@@ -75,7 +91,16 @@ public class ArenaRegistry {
         }
 
         for (String id : section.getKeys(false)) {
+            String path = "arenas.%s.".formatted(id);
+
             Arena arena = new Arena(id);
+            arena.setReady(config.getBoolean(path + "ready"));
+
+            for (GameLocation gameLocation : GameLocation.values()) {
+                Location location = LocationSerializer.fromString(path + gameLocation.getName());
+
+                arena.setLocation(gameLocation, location);
+            }
 
             arenas.put(id, arena);
         }
@@ -84,6 +109,12 @@ public class ArenaRegistry {
     private void saveData(Arena arena) {
         String path = "arenas.%s.".formatted(arena.getId());
 
-        config.set(path + "test", "null");
+        for (GameLocation gameLocation : GameLocation.values()) {
+            String location = LocationSerializer.toString(arena.getLocation(gameLocation));
+
+            config.set(path + gameLocation.getName(), location);
+        }
+
+        config.set(path + "ready", arena.isReady());
     }
 }

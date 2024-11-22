@@ -1,5 +1,6 @@
 package me.despical.ewduels.command;
 
+import me.despical.commandframework.Message;
 import me.despical.ewduels.Main;
 
 /**
@@ -14,6 +15,13 @@ public abstract class AbstractCommandHandler {
     static {
         plugin = Main.getPlugin(Main.class);
         plugin.getCommandFramework().addCustomParameter("User", args -> plugin.getUserManager().getUser(args.getSender()));
+
+        Message.SHORT_ARG_SIZE.setMessage((command, args) -> {
+            String correctUsage = plugin.getChatManager().getFormattedMessage("admin-commands.usage", command.usage());
+
+            args.sendMessage(correctUsage);
+            return true;
+        });
     }
 
     public AbstractCommandHandler() {

@@ -34,6 +34,18 @@ public class User {
         return plugin.getServer().getPlayer(uuid);
     }
 
+    public void sendMessage(String path) {
+        String message = plugin.getChatManager().getMessage(path);
+
+        this.getPlayer().sendMessage(message);
+    }
+
+    public void sendFormattedMessage(String path, Object... params) {
+        String message = plugin.getChatManager().getFormattedMessage(path, params);
+
+        this.getPlayer().sendMessage(message);
+    }
+
     public void sendRawMessage(String message, Object... params) {
         message = plugin.getChatManager().getFormattedRawMessage(message, params);
 
