@@ -2,16 +2,15 @@ package me.despical.ewduels.arena;
 
 import me.despical.commons.configuration.ConfigUtils;
 import me.despical.commons.serializer.LocationSerializer;
-import me.despical.ewduels.Main;
+import me.despical.ewduels.EWDuels;
 import me.despical.ewduels.user.User;
 import me.despical.ewduels.util.GameLocation;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Despical
@@ -20,11 +19,11 @@ import java.util.Set;
  */
 public class ArenaRegistry {
 
-    private final Main plugin;
+    private final EWDuels plugin;
     private final FileConfiguration config;
     private final Map<String, Arena> arenas;
 
-    public ArenaRegistry(Main plugin) {
+    public ArenaRegistry(EWDuels plugin) {
         this.plugin = plugin;
         this.config = ConfigUtils.getConfig(plugin, "arena");
         this.arenas = new HashMap<>();
@@ -40,18 +39,20 @@ public class ArenaRegistry {
             .orElse(null);
     }
 
+    public Arena getRandomAvailableArena() {
+        List<Arena> currentArenas = arenas.values().stream()
+            .filter(arena -> arena.isReady() && !arena.isSetupMode() && arena.getPlayers().isEmpty())
+            .collect(Collectors.toList());
+        Collections.shuffle(currentArenas);
+        return currentArenas.isEmpty() ? null : currentArenas.getFirst();
+    }
+
     public Arena getArena(String id) {
         return arenas.get(id);
     }
 
     public boolean isArena(String id) {
         return arenas.containsKey(id);
-    }
-
-    public boolean isInArena(User user) {
-        return arenas.values()
-            .stream()
-            .anyMatch(arena -> arena.isInArena(user));
     }
 
     public Set<Arena> getArenas() {

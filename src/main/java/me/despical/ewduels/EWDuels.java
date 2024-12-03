@@ -6,6 +6,7 @@ import me.despical.ewduels.arena.ArenaRegistry;
 import me.despical.ewduels.command.ArenaCommands;
 import me.despical.ewduels.command.PlayerCommands;
 import me.despical.ewduels.event.GeneralEvents;
+import me.despical.ewduels.event.InGameEvents;
 import me.despical.ewduels.handler.chat.ChatManager;
 import me.despical.ewduels.user.UserManager;
 import me.despical.fileitems.ItemManager;
@@ -16,7 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  * <p>
  * Created at 21.11.2024
  */
-public class Main extends JavaPlugin {
+public class EWDuels extends JavaPlugin {
 
     private ArenaRegistry arenaRegistry;
     private ArenaManager arenaManager;
@@ -28,7 +29,7 @@ public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         arenaRegistry = new ArenaRegistry(this);
-        arenaManager = new ArenaManager();
+        arenaManager = new ArenaManager(this);
         userManager = new UserManager();
         chatManager = new ChatManager(this);
         itemManager = new ItemManager(this);
@@ -38,6 +39,7 @@ public class Main extends JavaPlugin {
         commandFramework = new CommandFramework(this);
 
         new GeneralEvents();
+        new InGameEvents();
 
         new PlayerCommands();
         new ArenaCommands();
@@ -71,4 +73,5 @@ public class Main extends JavaPlugin {
     public CommandFramework getCommandFramework() {
         return commandFramework;
     }
+
 }

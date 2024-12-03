@@ -1,6 +1,7 @@
 package me.despical.ewduels.user;
 
-import me.despical.ewduels.Main;
+import me.despical.ewduels.EWDuels;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -12,43 +13,63 @@ import java.util.UUID;
  */
 public class User {
 
-    private static final Main plugin = Main.getPlugin(Main.class);
+    private static final EWDuels plugin = EWDuels.getPlugin(EWDuels.class);
+    private final Player player;
 
-    private final UUID uuid;
-    private final String name;
+    private UserState state = UserState.FREE;
 
     public User(Player player) {
-        this.uuid = player.getUniqueId();
-        this.name = player.getName();
+        this.player = player;
+    }
+
+    public boolean isInQueue() {
+        return state == UserState.IN_QUEUE;
+    }
+
+    public boolean isInMatch() {
+        return state == UserState.IN_MATCH || state == UserState.STARTING_MATCH;
     }
 
     public UUID getUniqueId() {
-        return uuid;
+        return player.getUniqueId();
     }
 
     public String getName() {
-        return name;
+        return player.getName();
     }
 
-    public Player getPlayer() {
-        return plugin.getServer().getPlayer(uuid);
+    public void teleport(Location location) {
+        player.teleport(location);
     }
 
     public void sendMessage(String path) {
         String message = plugin.getChatManager().getMessage(path);
 
-        this.getPlayer().sendMessage(message);
+        this.player.sendMessage(message);
     }
 
     public void sendFormattedMessage(String path, Object... params) {
         String message = plugin.getChatManager().getFormattedMessage(path, params);
 
-        this.getPlayer().sendMessage(message);
+        this.player.sendMessage(message);
     }
 
     public void sendRawMessage(String message, Object... params) {
         message = plugin.getChatManager().getFormattedRawMessage(message, params);
 
-        this.getPlayer().sendMessage(message);
+        this.player.sendMessage(message);
     }
+
+    public UserState getState() {
+        return state;
+    }
+
+    public void setState(UserState state) {
+        this.state = state;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
 }

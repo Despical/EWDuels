@@ -2,7 +2,8 @@ package me.despical.ewduels.handler.chat;
 
 import me.despical.commons.configuration.ConfigUtils;
 import me.despical.commons.util.Strings;
-import me.despical.ewduels.Main;
+import me.despical.ewduels.EWDuels;
+import me.despical.ewduels.util.Utils;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.text.MessageFormat;
@@ -18,21 +19,29 @@ public class ChatManager {
 
     private FileConfiguration config;
 
-    private final Main plugin;
+    private final EWDuels plugin;
     private final Map<String, String> cachedMessages;
 
-    public ChatManager(Main plugin) {
+    public ChatManager(EWDuels plugin) {
         this.plugin = plugin;
         this.cachedMessages = new HashMap<>();
 
-        config = ConfigUtils.getConfig(plugin, "messages");
+        reload();
+    }
+
+    public void reload() {
+        this.config = ConfigUtils.getConfig(plugin, "messages");
     }
 
     public String getMessage(String path) {
         String message = cachedMessages.get(path);
 
         if (message == null) {
-            message = config.getString(path);
+            if (config.isList(path)) {
+                message = Utils.listToString(config.getStringList(path));
+            } else {
+                message = config.getString(path);
+            }
 
             cachedMessages.put(path, message);
         }
@@ -44,7 +53,11 @@ public class ChatManager {
         String message = cachedMessages.get(path);
 
         if (message == null) {
-            message = config.getString(path);
+            if (config.isList(path)) {
+                message = Utils.listToString(config.getStringList(path));
+            } else {
+                message = config.getString(path);
+            }
 
             cachedMessages.put(path, message);
         }
@@ -58,4 +71,5 @@ public class ChatManager {
         message = MessageFormat.format(message, params);
         return message;
     }
+
 }

@@ -13,3 +13,19 @@ setup:
   missing-location: "&cArena could not be registered due to missing some of the game locations ({0})."
   location-set: "&a{0} location set."
   arena-deleted: "&aExiting the setup mode because the arena is deleted."
+
+queue-messages:
+  joined: '&eYou have joined the queue. A match will start when another players joins the queue too.'
+  in-queue-action-bar: '&6You are in queue for a EWDuels match...'
+  opponent-found: '&eAnother player just joined the queue. Match is starting...'
+  player-two-match-starting: '&eThere is already a player waiting in the queue. Match is starting...'
+  left: '&cYou have left the queue.'
+  not-in-queue: '&cYou are not in queue.'
+
+game-messages:
+  started:
+    - '              &b&lEW Duels'
+    - '        &c{0} &7vs &b{1}'
+  ended:
+    - '              &b&lEW Duels'
+    - '        {0} &a&lWINNER &7vs {1} &4&lLOSER'

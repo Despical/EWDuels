@@ -2,7 +2,7 @@ package me.despical.ewduels.arena.setup;
 
 import me.despical.commons.compat.XMaterial;
 import me.despical.commons.serializer.InventorySerializer;
-import me.despical.ewduels.Main;
+import me.despical.ewduels.EWDuels;
 import me.despical.ewduels.arena.Arena;
 import me.despical.ewduels.user.User;
 import me.despical.ewduels.util.GameLocation;
@@ -28,12 +28,12 @@ import java.util.stream.Stream;
  */
 public class SetupMode {
 
-    private final Main plugin;
+    private final EWDuels plugin;
     private final Arena arena;
     private final User user;
     private final Listener listener;
 
-    public SetupMode(Main plugin, Arena arena, User user) {
+    public SetupMode(EWDuels plugin, Arena arena, User user) {
         this.plugin = plugin;
         this.arena = arena;
         this.user = user;
@@ -41,9 +41,9 @@ public class SetupMode {
 
         plugin.getServer().getPluginManager().registerEvents(listener, plugin);
 
-        InventorySerializer.saveInventoryToFile(plugin, user.getPlayer());
+        InventorySerializer.saveInventoryToFile(plugin, user.player());
 
-        Player player = user.getPlayer();
+        Player player = user.player();
         player.getInventory().clear();
 
         List<String> itemNames = new ArrayList<>(Stream.of(GameLocation.values()).map(GameLocation::getName).toList());
@@ -58,7 +58,7 @@ public class SetupMode {
     }
 
     public void exitSetup(boolean force) {
-        Player player = user.getPlayer();
+        Player player = user.player();
         player.getInventory().clear();
 
         HandlerList.unregisterAll(listener);

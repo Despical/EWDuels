@@ -1,6 +1,6 @@
 package me.despical.ewduels.event;
 
-import me.despical.ewduels.Main;
+import me.despical.ewduels.EWDuels;
 import org.bukkit.event.Listener;
 
 /**
@@ -10,9 +10,10 @@ import org.bukkit.event.Listener;
  */
 public abstract class AbstractEventHandler implements Listener {
 
-    protected static final Main plugin = Main.getPlugin(Main.class);
+    protected static final EWDuels plugin = EWDuels.getPlugin(EWDuels.class);
 
     public AbstractEventHandler() {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
+
 }

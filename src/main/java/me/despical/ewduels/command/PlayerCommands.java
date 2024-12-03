@@ -21,36 +21,22 @@ public class PlayerCommands extends AbstractCommandHandler {
 
     @Command(
         name = "ew.join",
-        usage = "/ew join <arena_name>",
-        desc = "Creates a join attempt for the arena with the given ID.",
+        usage = "/ew join",
+        desc = "Joins the queue and awaits opponents.",
         min = 1,
         senderType = Command.SenderType.PLAYER
     )
     public void join(User user) {
-        Arena arena = plugin.getArenaRegistry().getArena(user);
-
-        if (arena == null) {
-            user.sendRawMessage("no arena with that name");
-            return;
-        }
-
-        plugin.getArenaManager().joinAttempt(user, arena);
+        plugin.getArenaManager().joinQueue(user);
     }
 
     @Command(
         name = "ew.leave",
         usage = "/ew leave",
-        desc = "Leaves the current arena if the player is in one.",
+        desc = "Leaves the queue if player is in one.",
         senderType = Command.SenderType.PLAYER
     )
     public void leave(User user) {
-        Arena arena = plugin.getArenaRegistry().getArena(user);
-
-        if (arena == null) {
-            user.sendRawMessage("&cYou are not playing EW Duels at the moment!");
-            return;
-        }
-
-        plugin.getArenaManager().leaveAttempt(user, arena);
+        plugin.getArenaManager().leaveQueue(user);
     }
 }

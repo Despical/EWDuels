@@ -1,7 +1,7 @@
 package me.despical.ewduels.command;
 
 import me.despical.commandframework.Message;
-import me.despical.ewduels.Main;
+import me.despical.ewduels.EWDuels;
 
 /**
  * @author Despical
@@ -10,10 +10,10 @@ import me.despical.ewduels.Main;
  */
 public abstract class AbstractCommandHandler {
 
-    protected static final Main plugin;
+    protected static final EWDuels plugin;
 
     static {
-        plugin = Main.getPlugin(Main.class);
+        plugin = EWDuels.getPlugin(EWDuels.class);
         plugin.getCommandFramework().addCustomParameter("User", args -> plugin.getUserManager().getUser(args.getSender()));
 
         Message.SHORT_ARG_SIZE.setMessage((command, args) -> {
