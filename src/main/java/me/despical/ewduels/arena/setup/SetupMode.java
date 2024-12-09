@@ -41,9 +41,9 @@ public class SetupMode {
 
         plugin.getServer().getPluginManager().registerEvents(listener, plugin);
 
-        InventorySerializer.saveInventoryToFile(plugin, user.player());
+        InventorySerializer.saveInventoryToFile(plugin, user.getPlayer());
 
-        Player player = user.player();
+        Player player = user.getPlayer();
         player.getInventory().clear();
 
         List<String> itemNames = new ArrayList<>(Stream.of(GameLocation.values()).map(GameLocation::getName).toList());
@@ -58,7 +58,7 @@ public class SetupMode {
     }
 
     public void exitSetup(boolean force) {
-        Player player = user.player();
+        Player player = user.getPlayer();
         player.getInventory().clear();
 
         HandlerList.unregisterAll(listener);

@@ -1,0 +1,32 @@
+kit:
+  helmet:
+    name: "&aEW Duels Helmet"
+    material: LEATHER_HELMET
+  chestplate:
+    name: "&aEW Duels Helmet"
+    material: LEATHER_CHESTPLATE
+  leggings:
+    name: "&aEW Duels Helmet"
+    material: LEATHER_LEGGINGS
+  boots:
+    name: "&aEW Duels Helmet"
+    material: LEATHER_BOOTS
+  sword:
+    material: STONE_SWORD
+    slot: 0
+  pickaxe:
+    material: STONE_PICKAXE
+    enchants:
+      - EFFICIENCY 10
+    slot: 1
+  bow:
+    material: BOW
+    slot: 3
+  blocks:
+    material: COBBLESTONE
+    slot: 4
+    amount: 64
+  arrows:
+    slot: 8
+    material: ARROW
+    amount: 2

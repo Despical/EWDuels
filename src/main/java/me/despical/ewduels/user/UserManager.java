@@ -21,6 +21,7 @@ public class UserManager {
 
     public User addUser(Player player) {
         User user = new User(player);
+        users.put(player.getUniqueId(), user);
         return user;
     }
 

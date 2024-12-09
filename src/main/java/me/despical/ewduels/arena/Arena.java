@@ -1,11 +1,17 @@
 package me.despical.ewduels.arena;
 
+import me.despical.commons.serializer.InventorySerializer;
 import me.despical.ewduels.EWDuels;
 import me.despical.ewduels.arena.setup.SetupMode;
 import me.despical.ewduels.user.User;
 import me.despical.ewduels.util.GameLocation;
+import me.despical.ewduels.util.Utils;
+import me.despical.fileitems.SpecialItem;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -119,6 +125,27 @@ public class Arena extends BukkitRunnable {
 
         firstPlayer.teleport(this.getLocation(GameLocation.FIRST_PLAYER));
         secondPlayer.teleport(this.getLocation(GameLocation.SECOND_PLAYER));
+
+        InventorySerializer.saveInventoryToFile(plugin, firstPlayer);
+        InventorySerializer.saveInventoryToFile(plugin, secondPlayer);
+        firstPlayer.getInventory().clear();
+        secondPlayer.getInventory().clear();
+
+        Collection<SpecialItem> gameKit = plugin.getItemManager().getItemsFromCategory("ewduels-kit");
+
+        for (SpecialItem item : gameKit) {
+            ItemStack itemStack = item.getItemStack();
+            Material type = itemStack.getType();
+
+            if (Utils.isArmor(type)) {
+                Utils.equipArmorToCorrectSlot(firstPlayer, Utils.dyeLeatherArmor(itemStack, Color.RED));
+                Utils.equipArmorToCorrectSlot(secondPlayer, Utils.dyeLeatherArmor(itemStack, Color.BLUE));
+            } else {
+                int slot = item.<Integer>getCustomKey("slot");
+                firstPlayer.getInventory().setItem(slot, item.getItemStack());
+                secondPlayer.getInventory().setItem(slot, item.getItemStack());
+            }
+        }
 
         this.scores.put(first, 0);
         this.scores.put(second, 0);

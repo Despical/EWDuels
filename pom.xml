@@ -46,9 +46,9 @@
             <version>1.5.12</version>
         </dependency>
         <dependency>
-            <groupId>com.github.Despical</groupId>
+            <groupId>com.github.despical</groupId>
             <artifactId>FileItems</artifactId>
-            <version>1.1.0</version>
+            <version>023adc328f</version>
         </dependency>
         <dependency>
             <groupId>me.clip</groupId>

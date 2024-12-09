@@ -1,6 +1,7 @@
 package me.despical.ewduels;
 
 import me.despical.commandframework.CommandFramework;
+import me.despical.commons.configuration.ConfigUtils;
 import me.despical.ewduels.arena.ArenaManager;
 import me.despical.ewduels.arena.ArenaRegistry;
 import me.despical.ewduels.command.ArenaCommands;
@@ -36,6 +37,7 @@ public class EWDuels extends JavaPlugin {
         itemManager.editItemBuilder(itemBuilder -> itemBuilder.unbreakable(true).hideTooltip(true));
         itemManager.addCustomKey("slot");
         itemManager.registerItemsFromResources("setup-items.yml", "items");
+        itemManager.registerItems("ewduels-kit", "kit", ConfigUtils.getConfig(this, "ingame-items"));
         commandFramework = new CommandFramework(this);
 
         new GeneralEvents();

@@ -1,6 +1,7 @@
 package me.despical.ewduels.user;
 
 import me.despical.ewduels.EWDuels;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -14,12 +15,15 @@ import java.util.UUID;
 public class User {
 
     private static final EWDuels plugin = EWDuels.getPlugin(EWDuels.class);
-    private final Player player;
+
+    private final String name;
+    private final UUID uuid;
 
     private UserState state = UserState.FREE;
 
     public User(Player player) {
-        this.player = player;
+        this.name = player.getName();
+        this.uuid = player.getUniqueId();
     }
 
     public boolean isInQueue() {
@@ -31,33 +35,33 @@ public class User {
     }
 
     public UUID getUniqueId() {
-        return player.getUniqueId();
+        return uuid;
     }
 
     public String getName() {
-        return player.getName();
+        return name;
     }
 
     public void teleport(Location location) {
-        player.teleport(location);
+        getPlayer().teleport(location);
     }
 
     public void sendMessage(String path) {
         String message = plugin.getChatManager().getMessage(path);
 
-        this.player.sendMessage(message);
+        getPlayer().sendMessage(message);
     }
 
     public void sendFormattedMessage(String path, Object... params) {
         String message = plugin.getChatManager().getFormattedMessage(path, params);
 
-        this.player.sendMessage(message);
+        getPlayer().sendMessage(message);
     }
 
     public void sendRawMessage(String message, Object... params) {
         message = plugin.getChatManager().getFormattedRawMessage(message, params);
 
-        this.player.sendMessage(message);
+        getPlayer().sendMessage(message);
     }
 
     public UserState getState() {
@@ -69,7 +73,7 @@ public class User {
     }
 
     public Player getPlayer() {
-        return player;
+        return Bukkit.getPlayer(uuid);
     }
 
 }
