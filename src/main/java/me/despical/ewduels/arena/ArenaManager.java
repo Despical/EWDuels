@@ -24,30 +24,45 @@ public class ArenaManager {
     }
 
     public void joinQueue(User player) {
+        if (this.queuePlayer == player) {
+            player.sendMessage("queue-messages.already-in-queue");
+            return;
+        }
+
         if (this.queuePlayer != null) {
-            queuePlayer.sendMessage(chatManager.getMessage("queue-messages.opponent-found"));
-            player.sendMessage(chatManager.getMessage("queue-messages.player-two-match-starting"));
+            queuePlayer.sendMessage("queue-messages.opponent-found");
+            player.sendMessage("queue-messages.player-two-match-starting");
             startGameFromQueue(player);
             return;
         }
 
+        Arena arena = arenaRegistry.getRandomAvailableArena();
+        if (arena == null) {
+            player.sendMessage("queue-messages.no-arena-available");
+            return;
+        }
+
         this.queuePlayer = player;
-        this.queuePlayer.sendMessage(chatManager.getMessage("queue-messages.joined"));
+        this.queuePlayer.sendMessage("queue-messages.joined");
     }
 
     public void leaveQueue(User player) {
         if (!this.queuePlayer.equals(player)) {
-            player.sendMessage(chatManager.getMessage("queue-messages.not-in-queue"));
+            player.sendMessage("queue-messages.not-in-queue");
             return;
         }
 
         this.queuePlayer = null;
-        player.sendMessage(chatManager.getMessage("queue-messages.left"));
+        player.sendMessage("queue-messages.left");
     }
 
     // P1 = queuePlayer - P2 = otherPlayer
     public void startGameFromQueue(User otherPlayer) {
         Arena arena = arenaRegistry.getRandomAvailableArena();
+
+        if (arena == null) {
+            return; // TODO: HANDLE THIS
+        }
 
         arena.addPlayer(queuePlayer);
         arena.addPlayer(otherPlayer);

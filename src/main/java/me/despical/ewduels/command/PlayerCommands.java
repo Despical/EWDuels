@@ -23,7 +23,6 @@ public class PlayerCommands extends AbstractCommandHandler {
         name = "ew.join",
         usage = "/ew join",
         desc = "Joins the queue and awaits opponents.",
-        min = 1,
         senderType = Command.SenderType.PLAYER
     )
     public void join(User user) {

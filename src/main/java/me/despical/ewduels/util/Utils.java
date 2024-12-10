@@ -42,7 +42,7 @@ public class Utils {
         }
     }
 
-    public static boolean isHelmet(Material material) {
+    public static boolean isHelmet(Material material) { //TODO: FIX 1.8 GOLDEN HELMET
         return material == Material.LEATHER_HELMET || material == Material.CHAINMAIL_HELMET ||
             material == Material.IRON_HELMET || material == Material.GOLDEN_HELMET ||
             material == Material.DIAMOND_HELMET || material == Material.NETHERITE_HELMET;

@@ -21,6 +21,7 @@ public class InGameEvents extends AbstractEventHandler {
 
         Arena arena = plugin.getArenaManager().getArenaOf(user);
         if (e.getClickedBlock().getType() == XMaterial.DRAGON_EGG.parseMaterial()) {
+            e.setCancelled(true);
             arena.addScore(user);
         }
     }

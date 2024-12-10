@@ -8,6 +8,9 @@ admin-commands:
   arena-list: "&aRegistered arenas: &7{0}"
   can-not-edit-now: "&cSomeone has already been editing this arena at the moment!"
 
+commands:
+  help-command: 'Help CMD Here'
+
 setup:
   exiting: "&aExiting the setup mode."
   missing-location: "&cArena could not be registered due to missing some of the game locations ({0})."
@@ -21,6 +24,8 @@ queue-messages:
   player-two-match-starting: '&eThere is already a player waiting in the queue. Match is starting...'
   left: '&cYou have left the queue.'
   not-in-queue: '&cYou are not in queue.'
+  no-arena-available: '&cNo arenas are available at the moment.'
+  already-in-queue: '&cYou are already in queue.'
 
 game-messages:
   started:

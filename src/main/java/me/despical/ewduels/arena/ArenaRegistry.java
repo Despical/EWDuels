@@ -81,6 +81,10 @@ public class ArenaRegistry {
     }
 
     public void saveData() {
+        for (Arena arena : arenas.values()) {
+            saveData(arena);
+        }
+
         ConfigUtils.saveConfig(plugin, config, "arena");
     }
 
@@ -118,4 +122,5 @@ public class ArenaRegistry {
 
         config.set(path + "ready", arena.isReady());
     }
+
 }

@@ -17,7 +17,7 @@ public abstract class AbstractCommandHandler {
         plugin.getCommandFramework().addCustomParameter("User", args -> plugin.getUserManager().getUser(args.getSender()));
 
         Message.SHORT_ARG_SIZE.setMessage((command, args) -> {
-            String correctUsage = plugin.getChatManager().getFormattedMessage("admin-commands.usage", command.usage());
+            String correctUsage = plugin.getChatManager().getFormattedMessage("commands.usage", command.usage());
 
             args.sendMessage(correctUsage);
             return true;

@@ -30,9 +30,9 @@ public class EWDuels extends JavaPlugin {
     @Override
     public void onEnable() {
         arenaRegistry = new ArenaRegistry(this);
+        chatManager = new ChatManager(this);
         arenaManager = new ArenaManager(this);
         userManager = new UserManager();
-        chatManager = new ChatManager(this);
         itemManager = new ItemManager(this);
         itemManager.editItemBuilder(itemBuilder -> itemBuilder.unbreakable(true).hideTooltip(true));
         itemManager.addCustomKey("slot");

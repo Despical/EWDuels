@@ -2,6 +2,7 @@ name: EWDuels
 version: ${project.version}
 description: An old minigame for Minecraft.
 main: me.despical.ewduels.EWDuels
+load: POSTWORLD
 
 api-version: 1.13
 softdepend:
