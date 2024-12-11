@@ -9,6 +9,7 @@ public enum StatisticType {
 
     WIN("win"),
     LOSE("lose"),
+    GAMES_PLAYED("gamesplayed"),
     LOCAL_SCORE;
 
     public static final StatisticType[] PERSISTENT_STATS = {};

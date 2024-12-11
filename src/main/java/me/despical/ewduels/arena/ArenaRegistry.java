@@ -80,6 +80,8 @@ public class ArenaRegistry {
             arena.endSetupSeason(true);
         }
 
+        arena.stop();
+
         config.set("arenas." + id, null);
 
         arenas.remove(id);
@@ -107,7 +109,7 @@ public class ArenaRegistry {
             arena.setReady(config.getBoolean(path + "ready"));
 
             if (arena.isReady()) {
-                arena.setArenaState(ArenaState.WAITING);
+                arena.start();
             }
 
             for (GameLocation gameLocation : GameLocation.values()) {

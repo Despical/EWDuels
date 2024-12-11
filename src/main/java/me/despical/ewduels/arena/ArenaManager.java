@@ -1,11 +1,7 @@
 package me.despical.ewduels.arena;
 
 import me.despical.ewduels.EWDuels;
-import me.despical.ewduels.handler.chat.ChatManager;
 import me.despical.ewduels.user.User;
-import me.despical.ewduels.util.GameLocation;
-
-import java.util.stream.Stream;
 
 /**
  * @author Despical
@@ -14,41 +10,41 @@ import java.util.stream.Stream;
  */
 public class ArenaManager {
 
-    private final ArenaRegistry arenaRegistry;
-    private final ChatManager chatManager;
+    private final EWDuels plugin;
 
     private User queuePlayer;
 
     public ArenaManager(EWDuels plugin) {
-        this.arenaRegistry = plugin.getArenaRegistry();
-        this.chatManager = plugin.getChatManager();
+        this.plugin = plugin;
     }
 
-    public void joinQueue(User player) {
-        Arena arena = arenaRegistry.getRandomAvailableArena();
+    public void joinQueue(User user) {
+        Arena arena = plugin.getArenaRegistry().getRandomAvailableArena();
 
         if (arena == null) {
-            player.sendMessage("queue-messages.no-arena-available");
+            user.sendMessage("queue-messages.no-arena-available");
             return;
         }
 
-        if (player.equals(queuePlayer)) {
-            player.sendMessage("queue-messages.already-in-queue");
+        if (user.equals(queuePlayer)) {
+            user.sendMessage("queue-messages.already-in-queue");
             return;
         }
 
         if (queuePlayer != null) {
             queuePlayer.sendMessage("queue-messages.opponent-found");
-            player.sendMessage("queue-messages.player-two-match-starting");
+            user.sendMessage("queue-messages.player-two-match-starting");
 
-            arena.addPlayer(player);
+            arena.addPlayer(user);
 
             queuePlayer = null;
             return;
         }
 
-        queuePlayer = player;
+        queuePlayer = user;
         queuePlayer.sendMessage("queue-messages.joined");
+
+        arena.addPlayer(user);
     }
 
     public void leaveQueue(User player) {
@@ -61,18 +57,6 @@ public class ArenaManager {
 
         player.sendMessage("queue-messages.left");
     }
-
-//    public void endGame(Arena arena, User winner, User loser) {
-//        arena.stop();
-//        String message = chatManager.getFormattedMessage("game-messages.ended", winner.getName(), loser.getName());
-//
-//        arena.getPlayers().forEach(player -> {
-//            player.sendRawMessage(message);
-//            player.sendRawMessage(message);
-//
-//            player.teleport(arena.getLocation(GameLocation.LOBBY));
-//        });
-//    }
 
     public User getQueuePlayer() {
         return queuePlayer;

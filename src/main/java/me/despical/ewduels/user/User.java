@@ -37,8 +37,12 @@ public class User {
         return name;
     }
 
-    public void teleport(Location location) {
-        getPlayer().teleport(location);
+    public void resetTemporaryStatistics() {
+        for (StatisticType type : StatisticType.values()) {
+            if (!type.isPersistent()) {
+                stats.put(type, 0);
+            }
+        }
     }
 
     public void sendMessage(String path) {

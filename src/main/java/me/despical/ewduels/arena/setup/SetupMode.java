@@ -83,6 +83,10 @@ public class SetupMode {
 
         arena.setReady(ready);
 
+        if (ready) {
+            arena.start();
+        }
+
         user.sendMessage("setup.exiting");
     }
 
