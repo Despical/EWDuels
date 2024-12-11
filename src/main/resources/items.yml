@@ -1,3 +1,9 @@
+queue-items:
+  leave-queue:
+    name: "&cLeave the Queue"
+    material: REDSTONE
+    slot: 4
+
 kit:
   helmet:
     name: "&aHelmet"

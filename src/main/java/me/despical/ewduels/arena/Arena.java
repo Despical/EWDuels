@@ -1,6 +1,7 @@
 package me.despical.ewduels.arena;
 
 import me.despical.commons.compat.ActionBar;
+import me.despical.commons.miscellaneous.AttributeUtils;
 import me.despical.commons.serializer.InventorySerializer;
 import me.despical.ewduels.EWDuels;
 import me.despical.ewduels.api.statistic.StatisticType;
@@ -141,7 +142,7 @@ public class Arena extends BukkitRunnable {
     }
 
     public void restoreTheMap() {
-        blockStates.forEach(BlockState::update);
+        blockStates.forEach(blockState -> blockState.update(true));
         blockStates.clear();
     }
 
@@ -158,6 +159,8 @@ public class Arena extends BukkitRunnable {
 
             Player player = user.getPlayer();
             player.teleport(this.getLocation(location));
+
+            AttributeUtils.healPlayer(player);
 
             giveKit(player, i == 0 ? Color.RED : Color.BLUE);
         }
@@ -185,13 +188,10 @@ public class Arena extends BukkitRunnable {
         switch (arenaState) {
             case WAITING -> {
                 if (players.size() < 2) {
-                    User user = players.get(0);
-
-                    if (user == null) {
-                        return;
+                    for (User user : players) {
+                        ActionBar.sendActionBar(user.getPlayer(), "Waiting for the opponent...");
                     }
 
-                    ActionBar.sendActionBar(user.getPlayer(), "Waiting for the opponent...");
                     return;
                 }
 
@@ -208,13 +208,18 @@ public class Arena extends BukkitRunnable {
                         return;
                     }
 
-                    InventorySerializer.saveInventoryToFile(plugin, player);
-
                     GameLocation location = i == 0 ? GameLocation.FIRST_PLAYER : GameLocation.SECOND_PLAYER;
                     player.teleport(this.getLocation(location));
+                    player.setFlying(false);
+                    player.setAllowFlight(false);
+                    player.setFoodLevel(20);
+
+                    AttributeUtils.healPlayer(player);
 
                     giveKit(player, i == 0 ? Color.RED : Color.BLUE);
                 }
+
+                setArenaState(ArenaState.IN_GAME);
             }
 
             case IN_GAME -> {

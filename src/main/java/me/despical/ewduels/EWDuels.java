@@ -9,6 +9,8 @@ import me.despical.ewduels.command.PlayerCommands;
 import me.despical.ewduels.event.GeneralEvents;
 import me.despical.ewduels.event.InGameEvents;
 import me.despical.ewduels.handler.chat.ChatManager;
+import me.despical.ewduels.option.ConfigOptions;
+import me.despical.ewduels.option.Option;
 import me.despical.ewduels.user.UserManager;
 import me.despical.fileitems.ItemManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -20,6 +22,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class EWDuels extends JavaPlugin {
 
+    private ConfigOptions configOptions;
     private ArenaRegistry arenaRegistry;
     private ArenaManager arenaManager;
     private UserManager userManager;
@@ -29,15 +32,17 @@ public class EWDuels extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        configOptions = new ConfigOptions(this);
         arenaRegistry = new ArenaRegistry(this);
         chatManager = new ChatManager(this);
         arenaManager = new ArenaManager(this);
         userManager = new UserManager(this);
         itemManager = new ItemManager(this);
-        itemManager.editItemBuilder(itemBuilder -> itemBuilder.unbreakable(true).hideTooltip(true));
+        itemManager.editItemBuilder(itemBuilder -> itemBuilder.unbreakable(true));
         itemManager.addCustomKey("slot");
         itemManager.registerItemsFromResources("setup-items.yml", "items");
-        itemManager.registerItems("ewduels-kit", "kit", ConfigUtils.getConfig(this, "ingame-items"));
+        itemManager.registerItems("items", "queue-items");
+        itemManager.registerItems("ewduels-kit", "kit", ConfigUtils.getConfig(this, "items"));
         commandFramework = new CommandFramework(this);
 
         new GeneralEvents();
@@ -75,5 +80,13 @@ public class EWDuels extends JavaPlugin {
 
     public CommandFramework getCommandFramework() {
         return commandFramework;
+    }
+
+    public <T> T getOption(Option option) {
+        return configOptions.getOption(option);
+    }
+
+    public boolean isEnabled(Option option) {
+        return this.<Boolean>getOption(option);
     }
 }

@@ -113,7 +113,7 @@ public class ArenaRegistry {
             }
 
             for (GameLocation gameLocation : GameLocation.values()) {
-                Location location = LocationSerializer.fromString(path + gameLocation.getName());
+                Location location = LocationSerializer.fromString(config.getString(path + gameLocation.getName()));
 
                 arena.setLocation(gameLocation, location);
             }

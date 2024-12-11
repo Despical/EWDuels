@@ -18,7 +18,7 @@ setup:
   arena-deleted: "&aExiting the setup mode because the arena is deleted."
 
 queue-messages:
-  joined: '&eYou have joined the queue. A match will start when another players joins the queue too.'
+  joined: '&eYou have joined the queue. A match will start when another player joins the queue.'
   in-queue-action-bar: '&6You are in queue for a EWDuels match...'
   opponent-found: '&eAnother player just joined the queue. Match is starting...'
   player-two-match-starting: '&eThere is already a player waiting in the queue. Match is starting...'

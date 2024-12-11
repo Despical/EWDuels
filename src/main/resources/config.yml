@@ -1,0 +1,3 @@
+Leave-Queue-Item: true
+Clear-Inventory-On-Queue: false
+Teleport-To-End-When-Leaving-Queue: false
