@@ -2,7 +2,6 @@ package me.despical.ewduels.command;
 
 import me.despical.commandframework.CommandArguments;
 import me.despical.commandframework.annotations.Command;
-import me.despical.ewduels.arena.Arena;
 import me.despical.ewduels.user.User;
 
 /**

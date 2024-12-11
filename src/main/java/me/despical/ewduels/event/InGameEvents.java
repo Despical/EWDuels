@@ -3,27 +3,30 @@ package me.despical.ewduels.event;
 import me.despical.commons.compat.XMaterial;
 import me.despical.ewduels.arena.Arena;
 import me.despical.ewduels.user.User;
-import org.bukkit.entity.Player;
+import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class InGameEvents extends AbstractEventHandler {
 
     @EventHandler
-    public void onEggClick(PlayerInteractEvent e) {
-        if (e.getClickedBlock() == null) return;
+    public void onEggClick(PlayerInteractEvent event) {
+        Block block = event.getClickedBlock();
 
-        Player player = e.getPlayer();
-        User user = plugin.getUserManager().getUser(player);
-        if (!user.isInMatch()) {
+        if (block == null) {
             return;
         }
 
-        Arena arena = plugin.getArenaManager().getArenaOf(user);
-        if (e.getClickedBlock().getType() == XMaterial.DRAGON_EGG.parseMaterial()) {
-            e.setCancelled(true);
-            arena.addScore(user);
+        User user = plugin.getUserManager().getUser(event.getPlayer());
+        Arena arena = user.getArena();
+
+        if (arena == null) {
+            return;
+        }
+
+        if (block.getType() == XMaterial.DRAGON_EGG.parseMaterial()) {
+            event.setCancelled(true);
+
         }
     }
-
 }

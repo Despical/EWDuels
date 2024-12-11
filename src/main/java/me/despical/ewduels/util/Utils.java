@@ -1,5 +1,6 @@
 package me.despical.ewduels.util;
 
+import me.despical.commons.compat.XMaterial;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,62 +16,43 @@ public class Utils {
     }
 
     public static boolean isArmor(Material material) {
-        return material == Material.LEATHER_HELMET || material == Material.LEATHER_CHESTPLATE ||
-            material == Material.LEATHER_LEGGINGS || material == Material.LEATHER_BOOTS ||
-            material == Material.CHAINMAIL_HELMET || material == Material.CHAINMAIL_CHESTPLATE ||
-            material == Material.CHAINMAIL_LEGGINGS || material == Material.CHAINMAIL_BOOTS ||
-            material == Material.IRON_HELMET || material == Material.IRON_CHESTPLATE ||
-            material == Material.IRON_LEGGINGS || material == Material.IRON_BOOTS ||
-            material == Material.GOLDEN_HELMET || material == Material.GOLDEN_CHESTPLATE ||
-            material == Material.GOLDEN_LEGGINGS || material == Material.GOLDEN_BOOTS ||
-            material == Material.DIAMOND_HELMET || material == Material.DIAMOND_CHESTPLATE ||
-            material == Material.DIAMOND_LEGGINGS || material == Material.DIAMOND_BOOTS ||
-            material == Material.NETHERITE_HELMET || material == Material.NETHERITE_CHESTPLATE ||
-            material == Material.NETHERITE_LEGGINGS || material == Material.NETHERITE_BOOTS;
+        return isHelmet(material) || isChestplate(material) || isLeggings(material) || isBoots(material);
     }
 
-    public static void equipArmorToCorrectSlot(Player player, ItemStack armorItem) {
-        Material material = armorItem.getType();
+    public static void equipArmorToCorrectSlot(Player player, ItemStack item, Color color) {
+        item = dyeLeatherArmor(item, color);
+
+        Material material = item.getType();
+
         if (isHelmet(material)) {
-            player.getInventory().setHelmet(armorItem);
+            player.getInventory().setHelmet(item);
         } else if (isChestplate(material)) {
-            player.getInventory().setChestplate(armorItem);
+            player.getInventory().setChestplate(item);
         } else if (isLeggings(material)) {
-            player.getInventory().setLeggings(armorItem);
+            player.getInventory().setLeggings(item);
         } else if (isBoots(material)) {
-            player.getInventory().setBoots(armorItem);
+            player.getInventory().setBoots(item);
         }
     }
 
-    public static boolean isHelmet(Material material) { //TODO: FIX 1.8 GOLDEN HELMET
-        return material == Material.LEATHER_HELMET || material == Material.CHAINMAIL_HELMET ||
-            material == Material.IRON_HELMET || material == Material.GOLDEN_HELMET ||
-            material == Material.DIAMOND_HELMET || material == Material.NETHERITE_HELMET;
+    public static boolean isHelmet(Material material) {
+        return XMaterial.matchXMaterial(material).name().endsWith("HELMET");
     }
 
     public static boolean isChestplate(Material material) {
-        return material == Material.LEATHER_CHESTPLATE || material == Material.CHAINMAIL_CHESTPLATE ||
-            material == Material.IRON_CHESTPLATE || material == Material.GOLDEN_CHESTPLATE ||
-            material == Material.DIAMOND_CHESTPLATE || material == Material.NETHERITE_CHESTPLATE;
+        return XMaterial.matchXMaterial(material).name().endsWith("CHESTPLATE");
     }
 
     public static boolean isLeggings(Material material) {
-        return material == Material.LEATHER_LEGGINGS || material == Material.CHAINMAIL_LEGGINGS ||
-            material == Material.IRON_LEGGINGS || material == Material.GOLDEN_LEGGINGS ||
-            material == Material.DIAMOND_LEGGINGS || material == Material.NETHERITE_LEGGINGS;
+        return XMaterial.matchXMaterial(material).name().endsWith("LEGGINGS");
     }
 
     public static boolean isBoots(Material material) {
-        return material == Material.LEATHER_BOOTS || material == Material.CHAINMAIL_BOOTS ||
-            material == Material.IRON_BOOTS || material == Material.GOLDEN_BOOTS ||
-            material == Material.DIAMOND_BOOTS || material == Material.NETHERITE_BOOTS;
+        return XMaterial.matchXMaterial(material).name().endsWith("BOOTS");
     }
 
     public static boolean isLeather(Material material) {
-        return material == Material.LEATHER_HELMET ||
-            material == Material.LEATHER_CHESTPLATE ||
-            material == Material.LEATHER_LEGGINGS ||
-            material == Material.LEATHER_BOOTS;
+        return XMaterial.matchXMaterial(material).name().startsWith("LEATHER");
     }
 
     public static ItemStack dyeLeatherArmor(ItemStack item, Color color) {
@@ -78,6 +60,7 @@ public class Utils {
 
         if (isLeather(item.getType())) {
             LeatherArmorMeta meta = (LeatherArmorMeta) cloned.getItemMeta();
+
             if (meta != null) {
                 meta.setColor(color);
                 cloned.setItemMeta(meta);
@@ -86,5 +69,4 @@ public class Utils {
 
         return cloned;
     }
-
 }

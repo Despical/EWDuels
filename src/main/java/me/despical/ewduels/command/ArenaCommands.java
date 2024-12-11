@@ -6,7 +6,6 @@ import me.despical.ewduels.arena.Arena;
 import me.despical.ewduels.user.User;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author Despical
@@ -66,18 +65,14 @@ public class ArenaCommands extends AbstractCommandHandler {
         senderType = Command.SenderType.PLAYER
     )
     public void list(User user) {
-        Set<Arena> arenas = plugin.getArenaRegistry().getArenas();
+        Set<String> arenas = plugin.getArenaRegistry().getArenaIds();
 
         if (arenas.isEmpty()) {
             user.sendMessage("admin-commands.no-arenas-created");
             return;
         }
 
-        String list = arenas.stream()
-            .map(Arena::getId)
-            .collect(Collectors.joining(", "));
-
-        user.sendFormattedMessage("admin-commands.arena-list", list);
+        user.sendFormattedMessage("admin-commands.arena-list", String.join(", ", arenas));
     }
 
     @Command(

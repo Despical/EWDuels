@@ -32,7 +32,7 @@ public class EWDuels extends JavaPlugin {
         arenaRegistry = new ArenaRegistry(this);
         chatManager = new ChatManager(this);
         arenaManager = new ArenaManager(this);
-        userManager = new UserManager();
+        userManager = new UserManager(this);
         itemManager = new ItemManager(this);
         itemManager.editItemBuilder(itemBuilder -> itemBuilder.unbreakable(true).hideTooltip(true));
         itemManager.addCustomKey("slot");
@@ -50,6 +50,7 @@ public class EWDuels extends JavaPlugin {
     @Override
     public void onDisable() {
         arenaRegistry.saveData();
+        userManager.getDatabase().shutdown();
     }
 
     public ArenaRegistry getArenaRegistry() {
@@ -75,5 +76,4 @@ public class EWDuels extends JavaPlugin {
     public CommandFramework getCommandFramework() {
         return commandFramework;
     }
-
 }

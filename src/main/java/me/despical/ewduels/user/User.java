@@ -1,10 +1,13 @@
 package me.despical.ewduels.user;
 
 import me.despical.ewduels.EWDuels;
-import org.bukkit.Bukkit;
+import me.despical.ewduels.api.statistic.StatisticType;
+import me.despical.ewduels.arena.Arena;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -18,20 +21,12 @@ public class User {
 
     private final String name;
     private final UUID uuid;
-
-    private UserState state = UserState.FREE;
+    private final Map<StatisticType, Integer> stats;
 
     public User(Player player) {
         this.name = player.getName();
         this.uuid = player.getUniqueId();
-    }
-
-    public boolean isInQueue() {
-        return state == UserState.IN_QUEUE;
-    }
-
-    public boolean isInMatch() {
-        return state == UserState.IN_MATCH || state == UserState.STARTING_MATCH;
+        this.stats = new EnumMap<>(StatisticType.class);
     }
 
     public UUID getUniqueId() {
@@ -64,16 +59,23 @@ public class User {
         getPlayer().sendMessage(message);
     }
 
-    public UserState getState() {
-        return state;
-    }
-
-    public void setState(UserState state) {
-        this.state = state;
-    }
-
     public Player getPlayer() {
-        return Bukkit.getPlayer(uuid);
+        return plugin.getServer().getPlayer(uuid);
     }
 
+    public Arena getArena() {
+        return plugin.getArenaRegistry().getArena(this);
+    }
+
+    public int getStat(StatisticType statisticType) {
+        return stats.computeIfAbsent(statisticType, stat -> 0);
+    }
+
+    public void setStat(StatisticType stat, int value) {
+        stats.put(stat, value);
+    }
+
+    public void addStat(StatisticType stat, int value) {
+        setStat(stat, getStat(stat) + value);
+    }
 }

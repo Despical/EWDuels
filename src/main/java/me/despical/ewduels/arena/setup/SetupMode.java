@@ -17,8 +17,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -46,7 +46,7 @@ public class SetupMode {
         Player player = user.getPlayer();
         player.getInventory().clear();
 
-        List<String> itemNames = new ArrayList<>(Stream.of(GameLocation.values()).map(GameLocation::getName).toList());
+        List<String> itemNames = Stream.of(GameLocation.values()).map(GameLocation::getName).collect(Collectors.toList());
         itemNames.add("save-and-exit");
 
         for (String itemName : itemNames) {
@@ -57,11 +57,16 @@ public class SetupMode {
         }
     }
 
-    public void exitSetup(boolean force) {
+    public void exitSetup(boolean delete) {
         Player player = user.getPlayer();
         player.getInventory().clear();
 
         HandlerList.unregisterAll(listener);
+
+        if (delete) {
+            user.sendMessage("setup.arena-deleted");
+            return;
+        }
 
         boolean ready = true;
 
@@ -71,17 +76,14 @@ public class SetupMode {
             if (location == null) {
                 ready = false;
 
-                if (!force) {
-                    user.sendFormattedMessage("setup.missing-location", "sa");
-                }
-
+                user.sendFormattedMessage("setup.missing-location", "sa");
                 break;
             }
         }
 
         arena.setReady(ready);
 
-        user.sendMessage("setup." + (force ? "arena-deleted" : "exiting"));
+        user.sendMessage("setup.exiting");
     }
 
     private class SetupEvents implements Listener {

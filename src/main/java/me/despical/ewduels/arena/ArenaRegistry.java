@@ -43,8 +43,9 @@ public class ArenaRegistry {
         List<Arena> currentArenas = arenas.values().stream()
             .filter(arena -> arena.isReady() && !arena.isSetupMode() && arena.getPlayers().isEmpty())
             .collect(Collectors.toList());
+
         Collections.shuffle(currentArenas);
-        return currentArenas.isEmpty() ? null : currentArenas.getFirst();
+        return currentArenas.isEmpty() ? null : currentArenas.get(0);
     }
 
     public Arena getArena(String id) {
@@ -57,6 +58,10 @@ public class ArenaRegistry {
 
     public Set<Arena> getArenas() {
         return Set.copyOf(arenas.values());
+    }
+
+    public Set<String> getArenaIds() {
+        return Set.copyOf(arenas.keySet());
     }
 
     public Arena registerNewArena(String id) {
@@ -101,6 +106,10 @@ public class ArenaRegistry {
             Arena arena = new Arena(id);
             arena.setReady(config.getBoolean(path + "ready"));
 
+            if (arena.isReady()) {
+                arena.setArenaState(ArenaState.WAITING);
+            }
+
             for (GameLocation gameLocation : GameLocation.values()) {
                 Location location = LocationSerializer.fromString(path + gameLocation.getName());
 
@@ -122,5 +131,4 @@ public class ArenaRegistry {
 
         config.set(path + "ready", arena.isReady());
     }
-
 }

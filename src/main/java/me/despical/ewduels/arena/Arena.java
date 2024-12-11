@@ -9,7 +9,6 @@ import me.despical.ewduels.util.Utils;
 import me.despical.fileitems.SpecialItem;
 import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -24,18 +23,19 @@ import java.util.*;
 public class Arena extends BukkitRunnable {
 
     private static final EWDuels plugin = EWDuels.getPlugin(EWDuels.class);
-    private final String id;
-    private final Map<GameLocation, Location> locations;
-    private boolean ready;
-    private SetupMode setupMode;
 
+    private boolean ready;
+
+    private SetupMode setupMode;
+    private ArenaState arenaState = ArenaState.INACTIVE;
+
+    private final String id;
     private final List<User> players;
-    private final Map<User, Integer> scores;
+    private final Map<GameLocation, Location> locations;
 
     Arena(String id) {
         this.id = id;
         this.players = new ArrayList<>();
-        this.scores = new HashMap<>();
         this.locations = new EnumMap<>(GameLocation.class);
     }
 
@@ -51,32 +51,24 @@ public class Arena extends BukkitRunnable {
         this.ready = ready;
     }
 
+    public void setArenaState(ArenaState arenaState) {
+        this.arenaState = arenaState;
+    }
+
+    public ArenaState getArenaState() {
+        return arenaState;
+    }
+
+    public boolean isArenaState(ArenaState arenaState) {
+        return this.arenaState == arenaState;
+    }
+
     public void addPlayer(User user) {
         players.add(user);
     }
 
     public void removePlayer(User user) {
         players.remove(user);
-    }
-
-    public User getRedTeam() {
-        return this.players.get(0);
-    }
-
-    public User getBlueTeam() {
-        return this.players.get(1);
-    }
-
-    public boolean isRedTeam(User player) {
-        return getRedTeam().equals(player);
-    }
-
-    public boolean isBlueTeam(User player) {
-        return getBlueTeam().equals(player);
-    }
-
-    public Team getTeamOf(User player) {
-        return isRedTeam(player) ? Team.RED : Team.BLUE;
     }
 
     public List<User> getPlayers() {
@@ -113,57 +105,44 @@ public class Arena extends BukkitRunnable {
     }
 
     public void start() {
-        User first = this.players.get(0);
-        User second = this.players.get(1);
-
-        if (first == null || second == null) {
+        if (players.size() < 2) {
             return;
         }
 
-        Player firstPlayer = first.getPlayer();
-        Player secondPlayer = second.getPlayer();
+        for (int i = 0; i < 2; i++) {
+            User user = players.get(i);
 
-        firstPlayer.teleport(this.getLocation(GameLocation.FIRST_PLAYER));
-        secondPlayer.teleport(this.getLocation(GameLocation.SECOND_PLAYER));
+            Player player = user.getPlayer();
 
-        InventorySerializer.saveInventoryToFile(plugin, firstPlayer);
-        InventorySerializer.saveInventoryToFile(plugin, secondPlayer);
-        firstPlayer.getInventory().clear();
-        secondPlayer.getInventory().clear();
-
-        Collection<SpecialItem> gameKit = plugin.getItemManager().getItemsFromCategory("ewduels-kit");
-
-        for (SpecialItem item : gameKit) {
-            ItemStack itemStack = item.getItemStack();
-            Material type = itemStack.getType();
-
-            if (Utils.isArmor(type)) {
-                Utils.equipArmorToCorrectSlot(firstPlayer, Utils.dyeLeatherArmor(itemStack, Color.RED));
-                Utils.equipArmorToCorrectSlot(secondPlayer, Utils.dyeLeatherArmor(itemStack, Color.BLUE));
-            } else {
-                int slot = item.<Integer>getCustomKey("slot");
-                firstPlayer.getInventory().setItem(slot, item.getItemStack());
-                secondPlayer.getInventory().setItem(slot, item.getItemStack());
+            if (player == null) {
+                break;
             }
+
+            InventorySerializer.saveInventoryToFile(plugin, player);
+
+            GameLocation location = i == 0 ? GameLocation.FIRST_PLAYER : GameLocation.SECOND_PLAYER;
+            player.teleport(this.getLocation(location));
+            player.getInventory().clear();
+
+            Collection<SpecialItem> gameKit = plugin.getItemManager().getItemsFromCategory("ewduels-kit");
+            Color color = i == 0 ? Color.RED : Color.BLUE;
+
+            for (SpecialItem item : gameKit) {
+                ItemStack itemStack = item.getItemStack();
+
+                if (Utils.isArmor(itemStack.getType())) {
+                    Utils.equipArmorToCorrectSlot(player, itemStack, color);
+                } else {
+                    player.getInventory().setItem(item.<Integer>getCustomKey("slot"), item.getItemStack());
+                }
+            }
+
         }
-
-        this.scores.put(first, 0);
-        this.scores.put(second, 0);
-
-        this.runTaskTimer(plugin, 20,20);
-    }
-
-    public int getScore(User player) {
-        return this.scores.get(player);
-    }
-
-    public void addScore(User player) {
-        this.scores.put(player, getScore(player) + 1);
+        this.runTaskTimer(plugin, 20, 20);
     }
 
     public void stop() {
         this.players.clear();
-        this.scores.clear();
 
         this.cancel();
     }
@@ -173,24 +152,16 @@ public class Arena extends BukkitRunnable {
         User first = this.players.get(0);
         User second = this.players.get(1);
 
-        int firstScore = this.scores.get(first);
-        int secondScore = this.scores.get(second);
+        int firstScore = 0;
+        int secondScore = 0;
 
         if (firstScore == 5) {
-            plugin.getArenaManager().endGame(this, first, second);
+
             return;
         }
 
         if (secondScore == 5) {
-            plugin.getArenaManager().endGame(this, second, first);
             return;
         }
     }
-
-    public enum Team {
-
-        RED, BLUE
-
-    }
-
 }

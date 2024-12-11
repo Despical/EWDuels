@@ -1,9 +1,13 @@
 package me.despical.ewduels.user;
 
+import me.despical.ewduels.EWDuels;
+import me.despical.ewduels.user.data.AbstractDatabase;
+import me.despical.ewduels.user.data.FlatFileStatistics;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -13,14 +17,17 @@ import java.util.UUID;
  */
 public class UserManager {
 
+    private final AbstractDatabase database;
     private final Map<UUID, User> users;
 
-    public UserManager() {
+    public UserManager(EWDuels plugin) {
+        this.database = new FlatFileStatistics(plugin);
         this.users = new HashMap<>();
     }
 
     public User addUser(Player player) {
         User user = new User(player);
+
         users.put(player.getUniqueId(), user);
         return user;
     }
@@ -37,5 +44,13 @@ public class UserManager {
         }
 
         return this.addUser(player);
+    }
+
+    public Set<User> getUsers() {
+        return Set.copyOf(users.values());
+    }
+
+    public AbstractDatabase getDatabase() {
+        return database;
     }
 }
