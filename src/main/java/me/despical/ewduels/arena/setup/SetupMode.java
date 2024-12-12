@@ -7,6 +7,7 @@ import me.despical.ewduels.arena.Arena;
 import me.despical.ewduels.user.User;
 import me.despical.ewduels.util.GameLocation;
 import me.despical.fileitems.SpecialItem;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -45,6 +46,8 @@ public class SetupMode {
 
         Player player = user.getPlayer();
         player.getInventory().clear();
+        player.setGameMode(GameMode.CREATIVE);
+        player.setAllowFlight(true);
 
         List<String> itemNames = Stream.of(GameLocation.values()).map(GameLocation::getName).collect(Collectors.toList());
         itemNames.add("save-and-exit");

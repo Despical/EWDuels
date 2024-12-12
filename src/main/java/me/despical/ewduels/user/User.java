@@ -3,7 +3,7 @@ package me.despical.ewduels.user;
 import me.despical.ewduels.EWDuels;
 import me.despical.ewduels.api.statistic.StatisticType;
 import me.despical.ewduels.arena.Arena;
-import org.bukkit.Location;
+import me.despical.ewduels.arena.Team;
 import org.bukkit.entity.Player;
 
 import java.util.EnumMap;
@@ -18,6 +18,8 @@ import java.util.UUID;
 public class User {
 
     private static final EWDuels plugin = EWDuels.getPlugin(EWDuels.class);
+
+    private Team team;
 
     private final String name;
     private final UUID uuid;
@@ -38,15 +40,25 @@ public class User {
     }
 
     public void resetTemporaryStatistics() {
-        for (StatisticType type : StatisticType.values()) {
-            if (!type.isPersistent()) {
-                stats.put(type, 0);
-            }
+        for (StatisticType type : StatisticType.PERSISTENT_STATS) {
+            stats.put(type, 0);
         }
+
+        this.team = null;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
     public void sendMessage(String path) {
         String message = plugin.getChatManager().getMessage(path);
+
+        if ("%do_not_send%".equals(message)) return;
 
         getPlayer().sendMessage(message);
     }

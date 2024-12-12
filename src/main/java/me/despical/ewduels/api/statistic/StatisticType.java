@@ -9,6 +9,8 @@ public enum StatisticType {
 
     WIN("win"),
     LOSE("lose"),
+    KILL("kill"),
+    DEATH("death"),
     GAMES_PLAYED("gamesplayed"),
     LOCAL_SCORE;
 

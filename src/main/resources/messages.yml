@@ -9,7 +9,7 @@ admin-commands:
   can-not-edit-now: "&cSomeone has already been editing this arena at the moment!"
 
 commands:
-  help-command: 'Help CMD Here'
+  help-command: "Help CMD Here"
 
 setup:
   exiting: "&aExiting the setup mode."
@@ -18,19 +18,53 @@ setup:
   arena-deleted: "&aExiting the setup mode because the arena is deleted."
 
 queue-messages:
-  joined: '&eYou have joined the queue. A match will start when another player joins the queue.'
-  in-queue-action-bar: '&6You are in queue for a EWDuels match...'
-  opponent-found: '&eAnother player just joined the queue. Match is starting...'
-  player-two-match-starting: '&eThere is already a player waiting in the queue. Match is starting...'
-  left: '&cYou have left the queue.'
-  not-in-queue: '&cYou are not in queue.'
-  no-arena-available: '&cNo arenas are available at the moment.'
-  already-in-queue: '&cYou are already in queue.'
+  action-bar: "&6You are in queue for a EW Duels match..."
+  joined: "&eYou have joined the queue. A match will start when another player joins the queue."
+  left: "&cYou have left the queue."
+  opponent-found: "&eAnother player just joined the queue. Match is starting..."
+  player-two-match-starting: "&eThere is already a player waiting in the queue. Match is starting..."
+  not-in-queue: "&cYou are already not in a queue!"
+  no-arena-available: "&cThere aren't any available arena at the moment."
+  already-in-queue: "&cYou are already in a queue for a EW Duels match."
 
 game-messages:
-  started:
-    - '              &b&lEW Duels'
-    - '        &c{0} &7vs &b{1}'
-  ended:
-    - '              &b&lEW Duels'
-    - '        {0} &a&lWINNER &7vs {1} &4&lLOSER'
+  starts-in-5-and-less: "&eThe game starts in &c{0} &esecond{1}!"
+  fell-into-void: "{0} &7fell into the void!"
+  killed-by: "{0} &7was killed by {1}&7."
+  fell-into-void-by: "&6{0}was sniped into the void by {1}."
+  dont-break-your-egg: "%do_not_send%"
+  explanation:
+    - "%no_center%&a&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+    - "&l&fEW Duels"
+    - ""
+    - "&eCross the bridge to break the Egg."
+    - "&eFend off opposing player that get in your way."
+    - ""
+    - "&eFirst team to score 5 goals wins!"
+    - ""
+    - "&f&lOpponent: &a{0}"
+    - ""
+    - "%no_center%&a&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+  new-round:
+    - "%no_center%&6&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+    - ""
+    - "{0} &7(&a{1}&c❤&7) &escored! &7({2}&7)"
+    - "{3} &7- {4}"
+    - ""
+    - "%no_center%&6&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+
+titles:
+  new-score:
+    title: ""
+    subtitle: ""
+
+placeholders:
+  team-colors:
+    blue: "&9"
+    red: "&c"
+  breaks:
+    - "&61st Break"
+    - "&62nd Break"
+    - "&63rd Break"
+    - "&64th Break"
+    - "&65th Break"

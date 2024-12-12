@@ -2,17 +2,19 @@ package me.despical.ewduels.arena;
 
 import me.despical.commons.compat.ActionBar;
 import me.despical.commons.miscellaneous.AttributeUtils;
+import me.despical.commons.miscellaneous.MiscUtils;
 import me.despical.commons.serializer.InventorySerializer;
 import me.despical.ewduels.EWDuels;
 import me.despical.ewduels.api.statistic.StatisticType;
 import me.despical.ewduels.arena.setup.SetupMode;
+import me.despical.ewduels.handler.chat.ChatManager;
+import me.despical.ewduels.option.Option;
 import me.despical.ewduels.user.User;
 import me.despical.ewduels.util.GameLocation;
 import me.despical.ewduels.util.Utils;
 import me.despical.fileitems.SpecialItem;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -27,7 +29,9 @@ import java.util.*;
 public class Arena extends BukkitRunnable {
 
     private static final EWDuels plugin = EWDuels.getPlugin(EWDuels.class);
+    private static final ChatManager chatManager = plugin.getChatManager();
 
+    private int timer;
     private boolean ready;
     private boolean started;
 
@@ -35,14 +39,14 @@ public class Arena extends BukkitRunnable {
     private ArenaState arenaState = ArenaState.INACTIVE;
 
     private final String id;
-    private final List<User> players;
-    private final Set<Block> blockStates;
+    private final Set<Block> placedBlocks;
+    private final Map<Team, User> players;
     private final Map<GameLocation, Location> locations;
 
     Arena(String id) {
         this.id = id;
-        this.players = new ArrayList<>();
-        this.blockStates = new HashSet<>();
+        this.placedBlocks = new HashSet<>();
+        this.players = new EnumMap<>(Team.class);
         this.locations = new EnumMap<>(GameLocation.class);
     }
 
@@ -71,21 +75,30 @@ public class Arena extends BukkitRunnable {
     }
 
     public void addPlayer(User user) {
-        players.add(user);
+        players.put(user.getTeam(), user);
+
+        if (players.size() == 2) {
+            timer = plugin.<Integer>getOption(Option.START_COUNTDOWN);
+        }
     }
 
     public void removePlayer(User user) {
-        players.remove(user);
+        players.remove(user.getTeam());
     }
 
     public List<User> getPlayers() {
-        return players.stream()
+        return players.values()
+            .stream()
             .filter(user -> user.getPlayer() != null)
             .toList();
     }
 
+    public User getPlayer(Team team) {
+        return players.get(team);
+    }
+
     public boolean isInArena(User user) {
-        return players.contains(user);
+        return players.containsValue(user);
     }
 
     public void setLocation(GameLocation gameLocation, Location location) {
@@ -113,6 +126,14 @@ public class Arena extends BukkitRunnable {
         return setupMode != null;
     }
 
+    public void setTimer(int timer) {
+        this.timer = timer;
+    }
+
+    public int getTimer() {
+        return timer;
+    }
+
     public void start() {
         if (started) {
             return;
@@ -133,7 +154,7 @@ public class Arena extends BukkitRunnable {
     }
 
     public void handleQuit(User loser) {
-        players.remove(loser);
+        players.remove(loser.getTeam());
 
         if (players.size() == 1) {
             User winner = players.get(0);
@@ -144,41 +165,49 @@ public class Arena extends BukkitRunnable {
 
             loser.addStat(StatisticType.LOSE, 1);
         }
+
+        plugin.getUserManager().removeUser(loser.getUniqueId());
     }
 
     public void handlePlacingBlocks(Block block) {
-        blockStates.add(block);
+        placedBlocks.add(block);
     }
 
     public boolean canBreak(Block block) {
-        return blockStates.contains(block);
+        return placedBlocks.contains(block);
     }
 
     public void restoreTheMap() {
-        blockStates.forEach(state -> state.setType(Material.AIR));
-        blockStates.clear();
+        placedBlocks.forEach(state -> state.setType(Material.AIR));
+        placedBlocks.clear();
     }
 
     public void handleNewPoint(User scorer) {
+        List<String> newRoundMessages = chatManager.getStringList("game-messages.new-round");
+
+        Player scorerPlayer = scorer.getPlayer();
         scorer.addStat(StatisticType.LOCAL_SCORE, 1);
 
         restoreTheMap();
 
-        for (int i = 0; i < 2; i++) {
-            GameLocation location = i == 0 ? GameLocation.FIRST_PLAYER : GameLocation.SECOND_PLAYER;
+        int score = scorer.getStat(StatisticType.LOCAL_SCORE);
+        String blueScore = chatManager.getColoredScore(this, Team.BLUE);
+        String redScore = chatManager.getColoredScore(this, Team.RED);
 
-            User user = players.get(i);
-            user.sendRawMessage("player : " + scorer.getName() + " scored!");
+        for (User user : players.values()) {
+            teleportToStart(user);
+            giveKit(user);
 
             Player player = user.getPlayer();
-            player.teleport(this.getLocation(location));
+            String opponentName = chatManager.getTeamColoredBoldName(scorer);
 
-            AttributeUtils.healPlayer(player);
+            for (String message : newRoundMessages) {
+                message = chatManager.getFormattedRawMessage(message, opponentName, (int) scorerPlayer.getHealth(),
+                    chatManager.getBreak(score), scorer.getTeam() == Team.BLUE ? blueScore : redScore, scorer.getTeam() == Team.BLUE ? redScore : blueScore);
 
-            giveKit(player, i == 0 ? Color.RED : Color.BLUE);
+                MiscUtils.sendCenteredMessage(player, message);
+            }
         }
-
-        int score = scorer.getStat(StatisticType.LOCAL_SCORE);
 
         if (score == 5) {
             scorer.sendRawMessage("you win!");
@@ -187,11 +216,13 @@ public class Arena extends BukkitRunnable {
         }
     }
 
-    private void giveKit(Player player, Color color) {
+    private void giveKit(User user) {
+        Player player = user.getPlayer();
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
 
         Collection<SpecialItem> gameKit = plugin.getItemManager().getItemsFromCategory("ewduels-kit");
+        Color color = user.getTeam().getColor();
 
         for (SpecialItem item : gameKit) {
             ItemStack itemStack = item.getItemStack();
@@ -204,33 +235,86 @@ public class Arena extends BukkitRunnable {
         }
     }
 
+    public void broadcastMessage(String path, Object... params) {
+        players.values().forEach(user -> user.sendFormattedMessage(path, params));
+    }
+
+    public void handleDeath(User victim, User killer) {
+        killer.addStat(StatisticType.KILL, 1);
+
+        String killerName = chatManager.getTeamColoredName(killer);
+        String victimName = chatManager.getTeamColoredName(victim);
+
+        for (User user : players.values()) {
+            user.sendFormattedMessage("game-messages.killed-by", victimName, killerName);
+        }
+
+        victim.addStat(StatisticType.DEATH, 1);
+
+        resetPlayerPosition(victim);
+    }
+
+    public void resetPlayerPosition(User user) {
+        teleportToStart(user);
+        giveKit(user);
+
+        Player player = user.getPlayer();
+
+        AttributeUtils.healPlayer(player);
+    }
+
+    public void teleportToStart(User user) {
+        Location location = this.getLocation(user.getTeam().getStartLocation());
+        Player player = user.getPlayer();
+        player.teleport(location);
+    }
+
+    public User getOpponent(User user) {
+        if (players.size() != 2 || !players.containsValue(user)) {
+            return null;
+        }
+
+        return players.get(user.getTeam().getOpposite());
+    }
+
     @Override
     public void run() {
+        int playerSize = players.size();
+
+        if (playerSize == 0 && arenaState == ArenaState.WAITING) {
+            return;
+        }
+
         switch (arenaState) {
             case WAITING -> {
-                if (players.size() < 2) {
-                    for (User user : players) {
-                        ActionBar.sendActionBar(user.getPlayer(), "Waiting for the opponent...");
+                if (playerSize < 2) {
+                    for (User user : players.values()) {
+                        ActionBar.sendActionBar(user.getPlayer(), chatManager.getMessage("queue-messages.action-bar"));
                     }
 
                     return;
                 }
 
-                setArenaState(ArenaState.STARTING);
+                if (timer > 0) {
+                    broadcastMessage("game-messages.starts-in-5-and-less", timer, timer != 1 ? "s" : "");
+
+                    if (--timer == 0) {
+                        setArenaState(ArenaState.STARTING);
+                    }
+                }
             }
 
             case STARTING -> {
-                for (int i = 0; i < 2; i++) {
-                    User user = players.get(i);
+                List<String> gameExplanation = chatManager.getStringList("game-messages.explanation");
 
+                for (User user : players.values()) {
                     Player player = user.getPlayer();
 
                     if (player == null) {
                         return;
                     }
 
-                    GameLocation location = i == 0 ? GameLocation.FIRST_PLAYER : GameLocation.SECOND_PLAYER;
-                    player.teleport(this.getLocation(location));
+                    player.teleport(this.getLocation(user.getTeam().getStartLocation()));
                     player.setFlying(false);
                     player.setAllowFlight(false);
                     player.setFoodLevel(20);
@@ -238,25 +322,44 @@ public class Arena extends BukkitRunnable {
 
                     AttributeUtils.healPlayer(player);
 
-                    giveKit(player, i == 0 ? Color.RED : Color.BLUE);
+                    giveKit(user);
+
+                    User opponent = getOpponent(user);
+
+                    for (String message : gameExplanation) {
+                        message = chatManager.getFormattedRawMessage(message, opponent.getName());
+
+                        MiscUtils.sendCenteredMessage(player, message);
+                    }
                 }
 
                 setArenaState(ArenaState.IN_GAME);
             }
 
             case IN_GAME -> {
+                int y = plugin.<Integer>getOption(Option.SEND_TO_THE_START_POS_Y);
+
+                for (User user : players.values()) {
+                    Player player = user.getPlayer();
+
+                    if (player.getLocation().getBlockY() < y) {
+                        broadcastMessage("game-messages.fell-into-void");
+
+                        user.addStat(StatisticType.DEATH, 1);
+                    }
+                }
             }
 
             case ENDING -> {
                 // Wait a few seconds maybe
-                User winner = players.stream().filter(user -> user.getStat(StatisticType.LOCAL_SCORE) == 5).findFirst().orElse(null);
-                User loser  = players.stream().filter(user -> !user.getName().equals(winner.getName())).findFirst().orElse(null);
+                User winner = players.values().stream().filter(user -> user.getStat(StatisticType.LOCAL_SCORE) == 5).findFirst().orElse(null);
+                User loser  = players.values().stream().filter(user -> !user.getName().equals(winner.getName())).findFirst().orElse(null);
 
-                for (User user : players) {
+                for (User user : players.values()) {
                     Player player = user.getPlayer();
                     player.getInventory().clear();
                     player.getInventory().setArmorContents(null);
-                    player.teleport(this.getLocation(GameLocation.LOBBY));
+                    player.teleport(this.getLocation(GameLocation.END));
 
                     InventorySerializer.loadInventory(plugin, player);
 

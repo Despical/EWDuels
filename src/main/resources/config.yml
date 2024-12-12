@@ -1,3 +1,7 @@
 Leave-Queue-Item: true
 Clear-Inventory-On-Queue: false
 Teleport-To-End-When-Leaving-Queue: false
+Teleport-To-Start-If-Less-Than: 0
+
+Time-Settings:
+  Start-Countdown: 5

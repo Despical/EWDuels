@@ -36,6 +36,10 @@ public class UserManager {
         users.remove(player.getUniqueId());
     }
 
+    public void removeUser(UUID uuid) {
+        users.remove(uuid);
+    }
+
     public User getUser(Player player) {
         User user = users.get(player.getUniqueId());
 

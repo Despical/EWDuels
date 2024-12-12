@@ -5,11 +5,14 @@ import me.despical.ewduels.arena.Arena;
 import me.despical.ewduels.arena.ArenaState;
 import me.despical.ewduels.user.User;
 import me.despical.fileitems.SpecialItem;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -29,6 +32,16 @@ public class InGameEvents extends AbstractEventHandler {
         Arena arena = user.getArena();
 
         if (arena == null || !arena.isArenaState(ArenaState.IN_GAME)) {
+            return;
+        }
+
+        Location location = block.getLocation();
+        Location playerEggLocation = arena.getLocation(user.getTeam().getEggLocation());
+
+        if (playerEggLocation.equals(location)) {
+            event.setCancelled(true);
+
+            user.sendMessage("game-messages.dont-break-your-egg");
             return;
         }
 
@@ -113,6 +126,66 @@ public class InGameEvents extends AbstractEventHandler {
 
         if (user.getArena() != null) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player damagerPlayer)) return;
+        if (!(event.getEntity() instanceof Player victimPlayer)) return;
+
+        User damager = plugin.getUserManager().getUser(damagerPlayer);
+        User victim = plugin.getUserManager().getUser(victimPlayer);
+
+        Arena arena = damager.getArena();
+
+        if (arena == null || !arena.equals(victim.getArena())) {
+            return;
+        }
+
+        if (!arena.isArenaState(ArenaState.IN_GAME)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        double health = victimPlayer.getHealth();
+
+        if (health - event.getFinalDamage() > 0) {
+            return;
+        }
+
+        event.setCancelled(true);
+
+        arena.handleDeath(victim, damager);
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+
+        User user = plugin.getUserManager().getUser(player);
+        Arena arena = user.getArena();
+
+        if (arena == null) {
+            return;
+        }
+
+        switch (event.getCause()) {
+            case VOID -> {
+                if (arena.isArenaState(ArenaState.IN_GAME)) {
+                    arena.resetPlayerPosition(user);
+                    arena.broadcastMessage("game-messages.fell-into-void", user.getName());
+                    return;
+                }
+
+                arena.teleportToStart(user);
+            }
+
+            case FALL -> {
+                if (!arena.isArenaState(ArenaState.IN_GAME)) {
+                    event.setCancelled(true);
+                }
+            }
         }
     }
 }

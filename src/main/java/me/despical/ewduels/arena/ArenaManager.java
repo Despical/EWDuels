@@ -1,5 +1,6 @@
 package me.despical.ewduels.arena;
 
+import me.despical.commons.miscellaneous.AttributeUtils;
 import me.despical.commons.serializer.InventorySerializer;
 import me.despical.ewduels.EWDuels;
 import me.despical.ewduels.option.Option;
@@ -45,11 +46,16 @@ public class ArenaManager {
             player.getInventory().setArmorContents(null);
         }
 
+        player.setFoodLevel(20);
+
+        AttributeUtils.healPlayer(player);
+
         if (queuePlayer != null) {
             arena = queuePlayer.getArena();
 
             queuePlayer.sendMessage("queue-messages.opponent-found");
             user.sendMessage("queue-messages.player-two-match-starting");
+            user.setTeam(Team.BLUE);
 
             arena.addPlayer(user);
 
@@ -66,21 +72,24 @@ public class ArenaManager {
             player.getInventory().setItem(item.<Integer>getCustomKey("slot"), item.getItemStack());
         }
 
+        user.setTeam(Team.RED);
+
         arena.addPlayer(user);
     }
 
     public void leaveQueue(User user) {
         Arena arena = plugin.getArenaRegistry().getArena(user);
 
-        if (arena == null || !queuePlayer.equals(user)) {
+        if (arena == null || !user.equals(queuePlayer)) {
             user.sendMessage("queue-messages.not-in-queue");
             return;
         }
 
+        arena.removePlayer(user);
+
         queuePlayer = null;
         user.sendMessage("queue-messages.left");
-
-        arena.removePlayer(user);
+        user.resetTemporaryStatistics();
 
         Player player = user.getPlayer();
         player.getInventory().clear();
@@ -91,9 +100,5 @@ public class ArenaManager {
         }
 
         InventorySerializer.loadInventory(plugin, player);
-    }
-
-    public User getQueuePlayer() {
-        return queuePlayer;
     }
 }

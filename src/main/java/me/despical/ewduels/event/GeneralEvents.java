@@ -54,12 +54,14 @@ public class GeneralEvents extends AbstractEventHandler {
 
     private void handleQuit(Player player) {
         User user = plugin.getUserManager().getUser(player);
+        Arena arena = user.getArena();
 
-        Optional.ofNullable(user.getArena()).ifPresent(arena -> {
+        if (arena != null) {
             teleportToEnd.put(player.getUniqueId(), arena);
 
             arena.handleQuit(user);
-        });
+            return;
+        }
 
         plugin.getUserManager().removeUser(player);
     }

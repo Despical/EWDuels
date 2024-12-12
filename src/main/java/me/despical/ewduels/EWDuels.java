@@ -25,18 +25,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class EWDuels extends JavaPlugin {
 
     private ConfigOptions configOptions;
+    private ChatManager chatManager;
     private ArenaRegistry arenaRegistry;
     private ArenaManager arenaManager;
     private UserManager userManager;
-    private ChatManager chatManager;
     private ItemManager itemManager;
     private CommandFramework commandFramework;
 
     @Override
     public void onEnable() {
         configOptions = new ConfigOptions(this);
-        arenaRegistry = new ArenaRegistry(this);
         chatManager = new ChatManager(this);
+        arenaRegistry = new ArenaRegistry(this);
         arenaManager = new ArenaManager(this);
         userManager = new UserManager(this);
         itemManager = new ItemManager(this, manager -> ItemOption.enableOptions(ItemOption.AMOUNT));
