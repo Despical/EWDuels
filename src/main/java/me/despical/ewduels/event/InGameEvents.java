@@ -6,10 +6,14 @@ import me.despical.ewduels.arena.ArenaState;
 import me.despical.ewduels.user.User;
 import me.despical.fileitems.SpecialItem;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 
 public class InGameEvents extends AbstractEventHandler {
 
@@ -24,7 +28,7 @@ public class InGameEvents extends AbstractEventHandler {
         User user = plugin.getUserManager().getUser(event.getPlayer());
         Arena arena = user.getArena();
 
-        if (arena == null) {
+        if (arena == null || !arena.isArenaState(ArenaState.IN_GAME)) {
             return;
         }
 
@@ -81,5 +85,34 @@ public class InGameEvents extends AbstractEventHandler {
         }
 
         plugin.getArenaManager().leaveQueue(user);
+    }
+
+    @EventHandler
+    public void onHunger(FoodLevelChangeEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+
+        User user = plugin.getUserManager().getUser(player);
+
+        if (user.getArena() != null) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onItemPickUp(PlayerPickupItemEvent event) {
+        User user = plugin.getUserManager().getUser(event.getPlayer());
+
+        if (user.getArena() != null) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent event) {
+        User user = plugin.getUserManager().getUser(event.getPlayer());
+
+        if (user.getArena() != null) {
+            event.setCancelled(true);
+        }
     }
 }

@@ -13,6 +13,8 @@ import me.despical.ewduels.option.ConfigOptions;
 import me.despical.ewduels.option.Option;
 import me.despical.ewduels.user.UserManager;
 import me.despical.fileitems.ItemManager;
+import me.despical.fileitems.ItemOption;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -37,8 +39,8 @@ public class EWDuels extends JavaPlugin {
         chatManager = new ChatManager(this);
         arenaManager = new ArenaManager(this);
         userManager = new UserManager(this);
-        itemManager = new ItemManager(this);
-        itemManager.editItemBuilder(itemBuilder -> itemBuilder.unbreakable(true));
+        itemManager = new ItemManager(this, manager -> ItemOption.enableOptions(ItemOption.AMOUNT));
+        itemManager.editItemBuilder(itemBuilder -> itemBuilder.unbreakable(true).flag(ItemFlag.values()));
         itemManager.addCustomKey("slot");
         itemManager.registerItemsFromResources("setup-items.yml", "items");
         itemManager.registerItems("items", "queue-items");

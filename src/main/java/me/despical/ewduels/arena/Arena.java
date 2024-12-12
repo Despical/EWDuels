@@ -10,8 +10,7 @@ import me.despical.ewduels.user.User;
 import me.despical.ewduels.util.GameLocation;
 import me.despical.ewduels.util.Utils;
 import me.despical.fileitems.SpecialItem;
-import org.bukkit.Color;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
@@ -37,7 +36,7 @@ public class Arena extends BukkitRunnable {
 
     private final String id;
     private final List<User> players;
-    private final Set<BlockState> blockStates;
+    private final Set<Block> blockStates;
     private final Map<GameLocation, Location> locations;
 
     Arena(String id) {
@@ -133,16 +132,30 @@ public class Arena extends BukkitRunnable {
         this.cancel();
     }
 
+    public void handleQuit(User loser) {
+        players.remove(loser);
+
+        if (players.size() == 1) {
+            User winner = players.get(0);
+
+            winner.sendRawMessage("You win, the other player has quit the game!");
+            winner.addStat(StatisticType.GAMES_PLAYED, 1);
+            winner.addStat(StatisticType.WIN, 1);
+
+            loser.addStat(StatisticType.LOSE, 1);
+        }
+    }
+
     public void handlePlacingBlocks(Block block) {
-        blockStates.add(block.getState());
+        blockStates.add(block);
     }
 
     public boolean canBreak(Block block) {
-        return blockStates.contains(block.getState());
+        return blockStates.contains(block);
     }
 
     public void restoreTheMap() {
-        blockStates.forEach(blockState -> blockState.update(true));
+        blockStates.forEach(state -> state.setType(Material.AIR));
         blockStates.clear();
     }
 
@@ -163,6 +176,14 @@ public class Arena extends BukkitRunnable {
             AttributeUtils.healPlayer(player);
 
             giveKit(player, i == 0 ? Color.RED : Color.BLUE);
+        }
+
+        int score = scorer.getStat(StatisticType.LOCAL_SCORE);
+
+        if (score == 5) {
+            scorer.sendRawMessage("you win!");
+
+            setArenaState(ArenaState.ENDING);
         }
     }
 
@@ -213,6 +234,7 @@ public class Arena extends BukkitRunnable {
                     player.setFlying(false);
                     player.setAllowFlight(false);
                     player.setFoodLevel(20);
+                    player.setGameMode(GameMode.SURVIVAL);
 
                     AttributeUtils.healPlayer(player);
 
@@ -223,15 +245,6 @@ public class Arena extends BukkitRunnable {
             }
 
             case IN_GAME -> {
-                for (User user : players) {
-                    int score = user.getStat(StatisticType.LOCAL_SCORE);
-
-                    if (score == 5) {
-                        user.sendRawMessage("you win!");
-
-                        setArenaState(ArenaState.ENDING);
-                    }
-                }
             }
 
             case ENDING -> {
