@@ -1,11 +1,14 @@
 package me.despical.ewduels.arena;
 
+import me.despical.commons.compat.XMaterial;
 import me.despical.commons.configuration.ConfigUtils;
 import me.despical.commons.serializer.LocationSerializer;
 import me.despical.ewduels.EWDuels;
 import me.despical.ewduels.user.User;
 import me.despical.ewduels.util.GameLocation;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -41,7 +44,7 @@ public class ArenaRegistry {
 
     public Arena getRandomAvailableArena() {
         List<Arena> currentArenas = arenas.values().stream()
-            .filter(arena -> arena.isReady() && !arena.isSetupMode() && arena.getPlayers().isEmpty())
+            .filter(arena -> arena.isReady() && !arena.isSetupMode() && arena.getPlayers().size() < 2)
             .collect(Collectors.toList());
 
         Collections.shuffle(currentArenas);
@@ -112,10 +115,22 @@ public class ArenaRegistry {
                 arena.start();
             }
 
+            Material dragonEgg = XMaterial.DRAGON_EGG.parseMaterial();
+
             for (GameLocation gameLocation : GameLocation.values()) {
                 Location location = LocationSerializer.fromString(config.getString(path + gameLocation.getName()));
 
                 arena.setLocation(gameLocation, location);
+
+                switch (gameLocation) {
+                    case FIRST_EGG, SECOND_EGG -> {
+                        Block block = location.getBlock();
+
+                        if (block.getType() != dragonEgg) {
+                            block.setType(dragonEgg);
+                        }
+                    }
+                }
             }
 
             arenas.put(id, arena);

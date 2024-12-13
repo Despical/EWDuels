@@ -1,6 +1,7 @@
 package me.despical.ewduels.arena;
 
 import me.despical.commons.compat.ActionBar;
+import me.despical.commons.compat.Titles;
 import me.despical.commons.miscellaneous.AttributeUtils;
 import me.despical.commons.miscellaneous.MiscUtils;
 import me.despical.commons.serializer.InventorySerializer;
@@ -221,6 +222,8 @@ public class Arena extends BukkitRunnable {
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
 
+        AttributeUtils.healPlayer(player);
+
         Collection<SpecialItem> gameKit = plugin.getItemManager().getItemsFromCategory("ewduels-kit");
         Color color = user.getTeam().getColor();
 
@@ -257,10 +260,6 @@ public class Arena extends BukkitRunnable {
     public void resetPlayerPosition(User user) {
         teleportToStart(user);
         giveKit(user);
-
-        Player player = user.getPlayer();
-
-        AttributeUtils.healPlayer(player);
     }
 
     public void teleportToStart(User user) {
@@ -296,7 +295,11 @@ public class Arena extends BukkitRunnable {
                 }
 
                 if (timer > 0) {
-                    broadcastMessage("game-messages.starts-in-5-and-less", timer, timer != 1 ? "s" : "");
+                    for (User user : players.values()) {
+                        user.sendFormattedMessage("game-messages.starts-in-5-and-less", timer, timer != 1 ? "s" : "");
+
+                        Titles.sendTitle(user.getPlayer(), chatManager.getListElement("titles.starts-in-5-and-less.title", 5 - timer), chatManager.getListElement("titles.starts-in-5-and-less.subtitle", 5 - timer));
+                    }
 
                     if (--timer == 0) {
                         setArenaState(ArenaState.STARTING);
@@ -319,8 +322,6 @@ public class Arena extends BukkitRunnable {
                     player.setAllowFlight(false);
                     player.setFoodLevel(20);
                     player.setGameMode(GameMode.SURVIVAL);
-
-                    AttributeUtils.healPlayer(player);
 
                     giveKit(user);
 

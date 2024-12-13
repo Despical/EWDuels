@@ -11,6 +11,7 @@ public enum Option {
     LEAVE_QUEUE_ITEM("Leave-Queue-Item", true),
     SEND_TO_END_ON_QUEUE_LEAVE("Teleport-To-End-When-Leaving-Queue", false),
     SEND_TO_THE_START_POS_Y("Teleport-To-Start-If-Less-Than", 0),
+    SEND_TO_LOBBY_ON_QUEUE("Teleport-To-Lobby-On-Queue", true),
     START_COUNTDOWN("Time-Settings.Start-Countdown", 5);
 
     final String path;

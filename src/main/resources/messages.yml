@@ -21,6 +21,7 @@ queue-messages:
   action-bar: "&6You are in queue for a EW Duels match..."
   joined: "&eYou have joined the queue. A match will start when another player joins the queue."
   left: "&cYou have left the queue."
+  another-player-left: "&cThe opponent player has left the queue."
   opponent-found: "&eAnother player just joined the queue. Match is starting..."
   player-two-match-starting: "&eThere is already a player waiting in the queue. Match is starting..."
   not-in-queue: "&cYou are already not in a queue!"
@@ -33,6 +34,7 @@ game-messages:
   killed-by: "{0} &7was killed by {1}&7."
   fell-into-void-by: "&6{0}was sniped into the void by {1}."
   dont-break-your-egg: "%do_not_send%"
+  match-cancelled-due-to-reload: "&cEW Duels match is cancelled due to server reload."
   explanation:
     - "%no_center%&a&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
     - "&l&fEW Duels"
@@ -57,14 +59,22 @@ titles:
   new-score:
     title: ""
     subtitle: ""
+  starts-in-5-and-less:
+    title:
+      - "&e5"
+      - "&e4"
+      - "&c3"
+      - "&c2"
+      - "&c1"
+    subtitle: []
 
 placeholders:
   team-colors:
     blue: "&9"
     red: "&c"
   breaks:
-    - "&61st Break"
-    - "&62nd Break"
-    - "&63rd Break"
-    - "&64th Break"
-    - "&65th Break"
+    - "&61st Goal"
+    - "&62nd Goal"
+    - "&63rd Goal"
+    - "&64th Goal"
+    - "&65th Goal"

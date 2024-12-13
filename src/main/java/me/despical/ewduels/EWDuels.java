@@ -2,6 +2,8 @@ package me.despical.ewduels;
 
 import me.despical.commandframework.CommandFramework;
 import me.despical.commons.configuration.ConfigUtils;
+import me.despical.commons.serializer.InventorySerializer;
+import me.despical.ewduels.arena.Arena;
 import me.despical.ewduels.arena.ArenaManager;
 import me.despical.ewduels.arena.ArenaRegistry;
 import me.despical.ewduels.command.ArenaCommands;
@@ -11,9 +13,12 @@ import me.despical.ewduels.event.InGameEvents;
 import me.despical.ewduels.handler.chat.ChatManager;
 import me.despical.ewduels.option.ConfigOptions;
 import me.despical.ewduels.option.Option;
+import me.despical.ewduels.user.User;
 import me.despical.ewduels.user.UserManager;
+import me.despical.ewduels.util.GameLocation;
 import me.despical.fileitems.ItemManager;
 import me.despical.fileitems.ItemOption;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -58,6 +63,19 @@ public class EWDuels extends JavaPlugin {
     public void onDisable() {
         arenaRegistry.saveData();
         userManager.getDatabase().shutdown();
+
+        for (Arena arena : arenaRegistry.getArenas()) {
+            for (User user : arena.getPlayers()) {
+                Player player = user.getPlayer();
+                player.getInventory().clear();
+                player.getInventory().setArmorContents(null);
+                player.teleport(arena.getLocation(GameLocation.END));
+
+                user.sendMessage("game-messages.match-cancelled-due-to-reload");
+
+                InventorySerializer.loadInventory(this, player);
+            }
+        }
     }
 
     public ArenaRegistry getArenaRegistry() {

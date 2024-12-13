@@ -30,7 +30,7 @@ public class ArenaManager {
             return;
         }
 
-        Arena arena = plugin.getArenaRegistry().getRandomAvailableArena();
+        Arena arena = queuePlayer != null ? queuePlayer.getArena() : plugin.getArenaRegistry().getRandomAvailableArena();
 
         if (queuePlayer == null && arena == null) {
             user.sendMessage("queue-messages.no-arena-available");
@@ -50,9 +50,17 @@ public class ArenaManager {
 
         AttributeUtils.healPlayer(player);
 
-        if (queuePlayer != null) {
-            arena = queuePlayer.getArena();
+        if (plugin.isEnabled(Option.SEND_TO_LOBBY_ON_QUEUE)) {
+            player.teleport(arena.getLocation(GameLocation.LOBBY));
+        }
 
+        if (plugin.isEnabled(Option.LEAVE_QUEUE_ITEM)) {
+            SpecialItem item = plugin.getItemManager().getItem("leave-queue");
+
+            player.getInventory().setItem(item.<Integer>getCustomKey("slot"), item.getItemStack());
+        }
+
+        if (queuePlayer != null) {
             queuePlayer.sendMessage("queue-messages.opponent-found");
             user.sendMessage("queue-messages.player-two-match-starting");
             user.setTeam(Team.BLUE);
@@ -66,12 +74,6 @@ public class ArenaManager {
         queuePlayer = user;
         queuePlayer.sendMessage("queue-messages.joined");
 
-        if (plugin.isEnabled(Option.LEAVE_QUEUE_ITEM)) {
-            SpecialItem item = plugin.getItemManager().getItem("leave-queue");
-
-            player.getInventory().setItem(item.<Integer>getCustomKey("slot"), item.getItemStack());
-        }
-
         user.setTeam(Team.RED);
 
         arena.addPlayer(user);
@@ -80,14 +82,19 @@ public class ArenaManager {
     public void leaveQueue(User user) {
         Arena arena = plugin.getArenaRegistry().getArena(user);
 
-        if (arena == null || !user.equals(queuePlayer)) {
+        if (arena == null) {
             user.sendMessage("queue-messages.not-in-queue");
             return;
         }
 
         arena.removePlayer(user);
 
-        queuePlayer = null;
+        if (user.equals(queuePlayer)) {
+            queuePlayer = null;
+        }
+
+        arena.broadcastMessage("queue-messages.another-player-left");
+
         user.sendMessage("queue-messages.left");
         user.resetTemporaryStatistics();
 

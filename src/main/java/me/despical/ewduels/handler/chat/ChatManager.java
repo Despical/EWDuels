@@ -103,6 +103,16 @@ public class ChatManager {
         return this.getTeamColor(team) + "&l" + arena.getPlayer(team).getStat(StatisticType.LOCAL_SCORE);
     }
 
+    public String getListElement(String path, int position) {
+        List<String> list = config.getStringList(path);
+
+        if (position >= list.size()) {
+            return "";
+        }
+
+        return Strings.format(list.get(position));
+    }
+
     public List<String> getStringList(String path) {
         return config.getStringList(path);
     }
