@@ -39,7 +39,7 @@ game-messages:
     - "%no_center%&a&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
     - "&l&fEW Duels"
     - ""
-    - "&eCross the bridge to break the Egg."
+    - "&eCross the bridge to score for your team."
     - "&eFend off opposing player that get in your way."
     - ""
     - "&eFirst team to score 5 goals wins!"
@@ -54,11 +54,19 @@ game-messages:
     - "{3} &7- {4}"
     - ""
     - "%no_center%&6&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+  summary:
+    - "%no_center%&6&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+    - "&f&lEW Duel &7- &a&l%formatted_time%"
+    - ""
+    - "&a%winner_name% &e&lWINNER! &a%loser_name%"
+    - ""
+    - "&a%winner_score% &7- &f&lGoals &7- &a%loser_score%"
+    - "&a%winner_damage% &7- &f&lDamage Dealt &7- &a%loser_damage%"
+    - "&a%winner_placed_blocks% &7- &f&lBlocks Placed &7- &a%loser_placed_blocks%"
+    - ""
+    - "%no_center%&6&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
 
 titles:
-  new-score:
-    title: ""
-    subtitle: ""
   starts-in-5-and-less:
     title:
       - "&e5"
@@ -67,6 +75,18 @@ titles:
       - "&c2"
       - "&c1"
     subtitle: []
+  started:
+    title: ""
+    subtitle: "&aFight!"
+  new-score:
+    title: "{0} scored!"
+    subtitle: "&7Starts in &a{0}s&7..."
+  win:
+    title: "{0} WINS!"
+    subtitle: ""
+  lose:
+    title: "{0} WINS!"
+    subtitle: ""
 
 placeholders:
   team-colors:
@@ -78,3 +98,6 @@ placeholders:
     - "&63rd Goal"
     - "&64th Goal"
     - "&65th Goal"
+  team:
+    red: "RED"
+    blue: "BLUE"

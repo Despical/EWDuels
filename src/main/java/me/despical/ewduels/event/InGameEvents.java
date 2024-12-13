@@ -1,6 +1,7 @@
 package me.despical.ewduels.event;
 
 import me.despical.commons.compat.XMaterial;
+import me.despical.ewduels.api.statistic.StatisticType;
 import me.despical.ewduels.arena.Arena;
 import me.despical.ewduels.arena.ArenaState;
 import me.despical.ewduels.user.User;
@@ -66,6 +67,8 @@ public class InGameEvents extends AbstractEventHandler {
             return;
         }
 
+        user.addStat(StatisticType.LOCAL_PLACED_BLOCKS, 1);
+
         arena.handlePlacingBlocks(event.getBlock());
     }
 
@@ -117,6 +120,7 @@ public class InGameEvents extends AbstractEventHandler {
 
         if (user.getArena() != null) {
             event.setCancelled(true);
+            event.getItem().remove();
         }
     }
 
@@ -149,8 +153,11 @@ public class InGameEvents extends AbstractEventHandler {
         }
 
         double health = victimPlayer.getHealth();
+        double finalDamage = event.getFinalDamage();
 
-        if (health - event.getFinalDamage() > 0) {
+        damager.addStat(StatisticType.LOCAL_DAMAGE, (int) Math.ceil(finalDamage));
+
+        if (health - finalDamage > 0) {
             return;
         }
 

@@ -1,6 +1,7 @@
 package me.despical.ewduels.handler.chat;
 
 import me.despical.commons.configuration.ConfigUtils;
+import me.despical.commons.string.StringFormatUtils;
 import me.despical.commons.util.Strings;
 import me.despical.ewduels.EWDuels;
 import me.despical.ewduels.api.statistic.StatisticType;
@@ -83,6 +84,11 @@ public class ChatManager {
         return message;
     }
 
+    public String getTeamNameBold(User user) {
+        String teamName = this.getTeamColor(user) + "&l" + this.getMessage("placeholders.team." + (user.getTeam() == Team.BLUE ? "blue" : "red"));;
+        return Strings.format(teamName);
+    }
+
     public String getTeamColor(Team team) {
         return this.getMessage("placeholders.team-colors." + (team == Team.BLUE ? "blue" : "red"));
     }
@@ -115,5 +121,24 @@ public class ChatManager {
 
     public List<String> getStringList(String path) {
         return config.getStringList(path);
+    }
+
+    public List<String> getSummaryMessage(User winner, User loser) {
+        Arena arena = winner.getArena();
+
+        return config.getStringList("game-messages.summary").stream()
+            .map(msg -> {
+                msg = msg.replace("%formatted_time%", StringFormatUtils.formatIntoMMSS(arena.getRoundTimer()));
+                msg = msg.replace("%winner_name%", winner.getName());
+                msg = msg.replace("%winner_score%", Integer.toString(winner.getStat(StatisticType.LOCAL_SCORE)));
+                msg = msg.replace("%winner_damage%", Integer.toString(winner.getStat(StatisticType.LOCAL_DAMAGE) / 2));
+                msg = msg.replace("%winner_placed_blocks%", Integer.toString(winner.getStat(StatisticType.LOCAL_PLACED_BLOCKS)));
+
+                msg = msg.replace("%loser_name%", loser.getName());
+                msg = msg.replace("%loser_score%", Integer.toString(loser.getStat(StatisticType.LOCAL_SCORE)));
+                msg = msg.replace("%loser_damage%", Integer.toString(loser.getStat(StatisticType.LOCAL_DAMAGE) / 2));
+                msg = msg.replace("%loser_placed_blocks%", Integer.toString(loser.getStat(StatisticType.LOCAL_PLACED_BLOCKS)));
+                return msg;
+            }).toList();
     }
 }

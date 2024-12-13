@@ -12,7 +12,10 @@ public enum Option {
     SEND_TO_END_ON_QUEUE_LEAVE("Teleport-To-End-When-Leaving-Queue", false),
     SEND_TO_THE_START_POS_Y("Teleport-To-Start-If-Less-Than", 0),
     SEND_TO_LOBBY_ON_QUEUE("Teleport-To-Lobby-On-Queue", true),
-    START_COUNTDOWN("Time-Settings.Start-Countdown", 5);
+    START_COUNTDOWN("Time-Settings.Start-Countdown", 5),
+    ROUND_STARTING_COUNTDOWN("Time-Settings.Round-Starting-Countdown", 3),
+    POINTS_TO_WIN("Points-To-Win", 5),
+    ENDING_COUNTDOWN("Time-Settings.Ending", 5);
 
     final String path;
     final Class<?> type;
