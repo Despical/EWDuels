@@ -65,6 +65,8 @@ public class EWDuels extends JavaPlugin {
         userManager.getDatabase().shutdown();
 
         for (Arena arena : arenaRegistry.getArenas()) {
+            arena.destroyVehicles();
+
             for (User user : arena.getPlayers()) {
                 Player player = user.getPlayer();
                 player.getInventory().clear();

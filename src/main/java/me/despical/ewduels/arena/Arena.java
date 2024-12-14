@@ -2,6 +2,7 @@ package me.despical.ewduels.arena;
 
 import me.despical.commons.compat.ActionBar;
 import me.despical.commons.compat.Titles;
+import me.despical.commons.compat.XPotion;
 import me.despical.commons.miscellaneous.AttributeUtils;
 import me.despical.commons.miscellaneous.MiscUtils;
 import me.despical.commons.serializer.InventorySerializer;
@@ -19,6 +20,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Bat;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -35,6 +37,7 @@ public class Arena extends BukkitRunnable {
     private static final EWDuels plugin = EWDuels.getPlugin(EWDuels.class);
     private static final ChatManager chatManager = plugin.getChatManager();
     private final String id;
+    private final Set<Bat> vehicles;
     private final Set<Block> placedBlocks;
     private final Map<Team, User> players;
     private final Map<GameLocation, Location> locations;
@@ -48,6 +51,7 @@ public class Arena extends BukkitRunnable {
 
     Arena(String id) {
         this.id = id;
+        this.vehicles = new HashSet<>();
         this.placedBlocks = new HashSet<>();
         this.players = new EnumMap<>(Team.class);
         this.locations = new EnumMap<>(GameLocation.class);
@@ -218,6 +222,8 @@ public class Arena extends BukkitRunnable {
             }
         }
 
+        createVehicles();
+
         int pointsToWin = plugin.<Integer>getOption(Option.POINTS_TO_WIN);
         String winnerTeamName = chatManager.getTeamNameBold(scorer);
 
@@ -269,6 +275,29 @@ public class Arena extends BukkitRunnable {
                 player.getInventory().setItem(item.<Integer>getCustomKey("slot"), item.getItemStack());
             }
         }
+    }
+
+    private void createVehicles() {
+        for (User user : players.values()) {
+            Location location = this.getLocation(user.getTeam().getStartLocation());
+            Bat bat = location.getWorld().spawn(location, Bat.class);
+            bat.addPotionEffect(XPotion.INVISIBILITY.buildInvisible(Integer.MAX_VALUE, 1));
+
+            Utils.disableEntityAI(bat);
+
+            vehicles.add(bat);
+
+            bat.setPassenger(user.getPlayer());
+        }
+    }
+
+    public void destroyVehicles() {
+        for (Bat bat : vehicles) {
+            bat.eject();
+            bat.remove();
+        }
+
+        vehicles.clear();
     }
 
     public void broadcastMessage(String path, Object... params) {
@@ -376,14 +405,19 @@ public class Arena extends BukkitRunnable {
             case IN_GAME -> {
                 roundTimer++;
 
-                 if (timer > 0 && lastScoredPlayer != null) {
-                    for (User user : players.values()) {
-                        Player player = user.getPlayer();
+                if (timer >= 0 && lastScoredPlayer != null) {
+                    if (timer == 0) {
+                        destroyVehicles();
+                    } else {
+                        for (User user : players.values()) {
+                            Player player = user.getPlayer();
 
-                        Titles.sendTitle(player, 0, 25, 2, chatManager.getFormattedMessage("titles.new-score.title", chatManager.getTeamColoredName(lastScoredPlayer)), chatManager.getFormattedMessage("titles.new-score.subtitle", timer));
+                            Titles.sendTitle(player, 0, 25, 2, chatManager.getFormattedMessage("titles.new-score.title", chatManager.getTeamColoredName(lastScoredPlayer)), chatManager.getFormattedMessage("titles.new-score.subtitle", timer));
+                        }
+
                     }
 
-                     timer--;
+                    timer--;
                 }
 
                 int y = plugin.<Integer>getOption(Option.SEND_TO_THE_START_POS_Y);
@@ -415,7 +449,7 @@ public class Arena extends BukkitRunnable {
                     InventorySerializer.loadInventory(plugin, player);
 
                     user.addStat(StatisticType.GAMES_PLAYED, 1);
-                 }
+                }
 
                 setArenaState(ArenaState.RESTARTING);
                 restoreTheMap();

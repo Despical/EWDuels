@@ -7,7 +7,6 @@ import me.despical.ewduels.arena.ArenaState;
 import me.despical.ewduels.option.Option;
 import me.despical.ewduels.user.User;
 import me.despical.fileitems.SpecialItem;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -20,6 +19,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.spigotmc.event.entity.EntityDismountEvent;
 
 public class InGameEvents extends AbstractEventHandler {
 
@@ -174,9 +174,10 @@ public class InGameEvents extends AbstractEventHandler {
             return;
         }
 
+        event.setDamage(0);
         event.setCancelled(true);
 
-        arena.handleDeath(victim, damager);
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> arena.handleDeath(victim, damager), 1L);
     }
 
     @EventHandler
@@ -208,6 +209,18 @@ public class InGameEvents extends AbstractEventHandler {
                     event.setCancelled(true);
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void onVehicleExit(EntityDismountEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+
+        User user = plugin.getUserManager().getUser(player);
+        Arena arena = user.getArena();
+
+        if (arena != null && arena.isArenaState(ArenaState.IN_GAME)) {
+            event.setCancelled(true);
         }
     }
 }
