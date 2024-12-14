@@ -49,8 +49,8 @@ public class PlayerCommands extends AbstractCommandHandler {
     public List<String> tabCompletion(CommandArguments arguments) {
         List<String> emptyList = new ArrayList<>();
 
-        if (arguments.isArgumentsEmpty()) {
-            return null;
+        if (arguments.getLength() != 1) {
+            return emptyList;
         }
 
         String arg = arguments.getArgument(0);
