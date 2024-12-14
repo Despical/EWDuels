@@ -1,8 +1,10 @@
 Leave-Queue-Item: true
 Clear-Inventory-On-Queue: false
 Teleport-To-End-When-Leaving-Queue: false
-Teleport-To-Start-If-Less-Than: 0
+Fall-Damage-Enabled: false
 Teleport-To-Lobby-On-Queue: true
+
+Teleport-To-Start-If-Less-Than: 0
 Points-To-Win: 5
 
 Time-Settings:

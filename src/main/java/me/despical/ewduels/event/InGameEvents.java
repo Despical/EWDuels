@@ -4,6 +4,7 @@ import me.despical.commons.compat.XMaterial;
 import me.despical.ewduels.api.statistic.StatisticType;
 import me.despical.ewduels.arena.Arena;
 import me.despical.ewduels.arena.ArenaState;
+import me.despical.ewduels.option.Option;
 import me.despical.ewduels.user.User;
 import me.despical.fileitems.SpecialItem;
 import org.bukkit.Location;
@@ -190,6 +191,8 @@ public class InGameEvents extends AbstractEventHandler {
 
             case FALL -> {
                 if (!arena.isArenaState(ArenaState.IN_GAME)) {
+                    event.setCancelled(true);
+                } else if (!plugin.isEnabled(Option.FALL_DAMAGE_ENABLED)) {
                     event.setCancelled(true);
                 }
             }

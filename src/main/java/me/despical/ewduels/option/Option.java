@@ -15,6 +15,7 @@ public enum Option {
     START_COUNTDOWN("Time-Settings.Start-Countdown", 5),
     ROUND_STARTING_COUNTDOWN("Time-Settings.Round-Starting-Countdown", 3),
     POINTS_TO_WIN("Points-To-Win", 5),
+    FALL_DAMAGE_ENABLED("Fall-Damage-Enabled", false),
     ENDING_COUNTDOWN("Time-Settings.Ending", 5);
 
     final String path;
