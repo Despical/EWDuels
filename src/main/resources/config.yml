@@ -6,6 +6,7 @@ Teleport-To-Lobby-On-Queue: true
 
 Teleport-To-Start-If-Less-Than: 0
 Points-To-Win: 5
+Egg-Protection-Radius: 2
 
 Time-Settings:
   Start-Countdown: 5

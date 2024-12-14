@@ -16,6 +16,7 @@ public enum Option {
     ROUND_STARTING_COUNTDOWN("Time-Settings.Round-Starting-Countdown", 3),
     POINTS_TO_WIN("Points-To-Win", 5),
     FALL_DAMAGE_ENABLED("Fall-Damage-Enabled", false),
+    EGG_PROTECTION_RADIUS("Egg-Protection-Radius", 2),
     ENDING_COUNTDOWN("Time-Settings.Ending", 5);
 
     final String path;

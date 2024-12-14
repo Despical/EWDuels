@@ -34,6 +34,7 @@ game-messages:
   killed-by: "{0} &7was killed by {1}&7."
   fell-into-void-by: "&6{0}was sniped into the void by {1}."
   dont-break-your-egg: "%do_not_send%"
+  cant-place-here: "&cYou can not place blocks around your egg!"
   match-cancelled-due-to-reload: "&cEW Duels match is cancelled due to server reload."
   explanation:
     - "%no_center%&a&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"

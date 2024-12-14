@@ -7,6 +7,7 @@ import me.despical.ewduels.arena.ArenaState;
 import me.despical.ewduels.option.Option;
 import me.despical.ewduels.user.User;
 import me.despical.fileitems.SpecialItem;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -65,6 +66,17 @@ public class InGameEvents extends AbstractEventHandler {
 
         if (!arena.isArenaState(ArenaState.IN_GAME)) {
             event.setCancelled(true);
+            return;
+        }
+
+        Location location = event.getBlock().getLocation();
+        Location eggLocation = arena.getLocation(user.getTeam().getEggLocation());
+        int radius = plugin.<Integer>getOption(Option.EGG_PROTECTION_RADIUS);
+
+        if (location.distance(eggLocation) < radius) {
+            event.setCancelled(true);
+
+            user.sendMessage("game-messages.cant-place-here");
             return;
         }
 
