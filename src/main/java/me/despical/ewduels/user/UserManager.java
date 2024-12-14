@@ -23,6 +23,8 @@ public class UserManager {
     public UserManager(EWDuels plugin) {
         this.database = new FlatFileStatistics(plugin);
         this.users = new HashMap<>();
+
+        plugin.getServer().getOnlinePlayers().forEach(this::addUser);
     }
 
     public User addUser(Player player) {

@@ -6,6 +6,7 @@ import me.despical.commons.util.Strings;
 import me.despical.ewduels.EWDuels;
 import me.despical.ewduels.api.statistic.StatisticType;
 import me.despical.ewduels.arena.Arena;
+import me.despical.ewduels.arena.ArenaState;
 import me.despical.ewduels.arena.Team;
 import me.despical.ewduels.user.User;
 import me.despical.ewduels.util.Utils;
@@ -15,6 +16,7 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author Despical
@@ -34,11 +36,16 @@ public class ChatManager {
         this.cachedMessages = new HashMap<>();
 
         reload();
+
+        Stream.of(ArenaState.values()).forEach(arenaState -> arenaState.setFormattedName(this.getMessage(arenaState.getPath())));
     }
 
     public void reload() {
         config = ConfigUtils.getConfig(plugin, "messages");
         breakPlaceholder = config.getStringList("placeholders.breaks");
+
+        StringFormatUtils.setTimeFormat(this.getMessage("scoreboard.placeholders.timer-format"));
+        StringFormatUtils.setDateFormat(this.getMessage("scoreboard.placeholders.date-format"));
     }
 
     public String getBreak(int score) {

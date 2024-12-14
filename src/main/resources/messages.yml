@@ -89,6 +89,71 @@ titles:
     title: "{0} WINS!"
     subtitle: ""
 
+scoreboard:
+  title: "&e&lEW DUELS"
+  placeholders:
+    date-format: "dd/MM/yy"
+    timer-format: "%02d:%02d"
+  content:
+    waiting:
+      - "&7%date%"
+      - ""
+      - "&fMap: &a%map_name%"
+      - "&fPlayers: &a%players%/2"
+      - ""
+      - "&fWaiting..."
+      - ""
+      - "&fVersion: &7%version%"
+      - ""
+      - "&epatreon.com/despical"
+    starting:
+      - "&7%date%"
+      - ""
+      - "&fMap: &a%map_name%"
+      - "&fPlayers: &a%players%/2"
+      - ""
+      - "&fStarting in &a%timer%s"
+      - ""
+      - "&fVersion: &7%version%"
+      - ""
+      - "&epatreon.com/despical"
+    in-game:
+      - "&7%date%"
+      - ""
+      - "&fTime: &a%formatted_timer%"
+      - ""
+      - "&9[B] %blue_score%"
+      - "&c[R] %red_score%"
+      - ""
+      - "&fKills: &a%kills%"
+      - "&fGoals: &a%score%"
+      - ""
+      - "&fWinstreak: &a%win_streak%"
+      - ""
+      - "&epatreon.com/despical"
+    ending:
+      - "&7%date%"
+      - ""
+      - "&fTime: &a%formatted_timer%"
+      - ""
+      - "&9[B] %blue_score%"
+      - "&c[R] %red_score%"
+      - ""
+      - "&fKills: &a%kills%"
+      - "&fGoals: &a%score%"
+      - ""
+      - "&fWinstreak: &a%win_streak%"
+      - ""
+      - "&epatreon.com/despical"
+
+arena-states:
+  waiting: "Waiting"
+  starting: "Starting"
+  playing: "Playing"
+  ending: "Ending"
+  restarting: "Restarting"
+  inactive: "Inactive"
+
 placeholders:
   team-colors:
     blue: "&9"

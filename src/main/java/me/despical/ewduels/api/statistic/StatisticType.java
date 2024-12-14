@@ -12,8 +12,11 @@ public enum StatisticType {
     KILL("kill"),
     DEATH("death"),
     GAMES_PLAYED("gamesplayed"),
+    WIN_STREAK("winstreak"),
     LOCAL_SCORE,
     LOCAL_DAMAGE,
+    LOCAL_KILL,
+    LOCAL_DEATH,
     LOCAL_PLACED_BLOCKS;
 
     public static final StatisticType[] PERSISTENT_STATS = {};

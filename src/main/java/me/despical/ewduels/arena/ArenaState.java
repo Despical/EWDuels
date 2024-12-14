@@ -7,10 +7,33 @@ package me.despical.ewduels.arena;
  */
 public enum ArenaState {
 
-    WAITING,
-    STARTING,
-    IN_GAME,
-    ENDING,
-    RESTARTING,
-    INACTIVE
+    WAITING("waiting"),
+    STARTING("starting"),
+    IN_GAME("in-game"),
+    ENDING("ending"),
+    RESTARTING("restarting"),
+    INACTIVE("inactive");
+
+    private String formattedName;
+    private final String defaultName;
+
+    ArenaState(String path) {
+        this.defaultName = path;
+    }
+
+    public String getPath() {
+        return "arena-states." + defaultName;
+    }
+
+    public String getDefaultName() {
+        return defaultName;
+    }
+
+    public String getFormattedName() {
+        return formattedName;
+    }
+
+    public void setFormattedName(String formattedName) {
+        this.formattedName = formattedName;
+    }
 }

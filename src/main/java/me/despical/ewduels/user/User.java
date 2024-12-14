@@ -5,6 +5,7 @@ import me.despical.ewduels.api.statistic.StatisticType;
 import me.despical.ewduels.arena.Arena;
 import me.despical.ewduels.arena.Team;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -20,6 +21,7 @@ public class User {
     private static final EWDuels plugin = EWDuels.getPlugin(EWDuels.class);
 
     private Team team;
+    private Scoreboard cachedScoreboard;
 
     private final String name;
     private final UUID uuid;
@@ -93,5 +95,17 @@ public class User {
 
     public void addStat(StatisticType stat, int value) {
         setStat(stat, getStat(stat) + value);
+    }
+
+    public void cacheScoreboard() {
+        this.cachedScoreboard = getPlayer().getScoreboard();
+    }
+
+    public void removeScoreboard() {
+        if (cachedScoreboard != null) {
+            getPlayer().setScoreboard(cachedScoreboard);
+
+            cachedScoreboard = null;
+        }
     }
 }

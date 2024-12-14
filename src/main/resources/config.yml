@@ -3,6 +3,7 @@ Clear-Inventory-On-Queue: false
 Teleport-To-End-When-Leaving-Queue: false
 Fall-Damage-Enabled: false
 Teleport-To-Lobby-On-Queue: true
+Scoreboard-Enabled: true
 
 Teleport-To-Start-If-Less-Than: 0
 Points-To-Win: 5

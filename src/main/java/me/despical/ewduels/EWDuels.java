@@ -2,6 +2,7 @@ package me.despical.ewduels;
 
 import me.despical.commandframework.CommandFramework;
 import me.despical.commons.configuration.ConfigUtils;
+import me.despical.commons.scoreboard.ScoreboardLib;
 import me.despical.commons.serializer.InventorySerializer;
 import me.despical.ewduels.arena.Arena;
 import me.despical.ewduels.arena.ArenaManager;
@@ -39,6 +40,8 @@ public class EWDuels extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        ScoreboardLib.setPluginInstance(this);
+
         configOptions = new ConfigOptions(this);
         chatManager = new ChatManager(this);
         arenaRegistry = new ArenaRegistry(this);
@@ -74,6 +77,8 @@ public class EWDuels extends JavaPlugin {
                 player.teleport(arena.getLocation(GameLocation.END));
 
                 user.sendMessage("game-messages.match-cancelled-due-to-reload");
+
+                arena.getScoreboardManager().removeScoreboard(user);
 
                 InventorySerializer.loadInventory(this, player);
             }

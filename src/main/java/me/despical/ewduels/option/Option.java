@@ -17,7 +17,8 @@ public enum Option {
     POINTS_TO_WIN("Points-To-Win", 5),
     FALL_DAMAGE_ENABLED("Fall-Damage-Enabled", false),
     EGG_PROTECTION_RADIUS("Egg-Protection-Radius", 2),
-    ENDING_COUNTDOWN("Time-Settings.Ending", 5);
+    ENDING_COUNTDOWN("Time-Settings.Ending", 5),
+    SCOREBOARD_ENABLED("Scoreboard-Enabled", true);
 
     final String path;
     final Class<?> type;

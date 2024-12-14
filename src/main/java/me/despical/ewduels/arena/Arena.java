@@ -8,6 +8,7 @@ import me.despical.commons.miscellaneous.MiscUtils;
 import me.despical.commons.serializer.InventorySerializer;
 import me.despical.ewduels.EWDuels;
 import me.despical.ewduels.api.statistic.StatisticType;
+import me.despical.ewduels.arena.scoreboard.ScoreboardManager;
 import me.despical.ewduels.arena.setup.SetupMode;
 import me.despical.ewduels.handler.chat.ChatManager;
 import me.despical.ewduels.option.Option;
@@ -36,11 +37,14 @@ public class Arena extends BukkitRunnable {
 
     private static final EWDuels plugin = EWDuels.getPlugin(EWDuels.class);
     private static final ChatManager chatManager = plugin.getChatManager();
+
     private final String id;
+    private final ScoreboardManager scoreboardManager;
     private final Set<Bat> vehicles;
     private final Set<Block> placedBlocks;
     private final Map<Team, User> players;
     private final Map<GameLocation, Location> locations;
+
     private int timer;
     private int roundTimer;
     private boolean ready;
@@ -51,6 +55,7 @@ public class Arena extends BukkitRunnable {
 
     Arena(String id) {
         this.id = id;
+        this.scoreboardManager = new ScoreboardManager(plugin, this);
         this.vehicles = new HashSet<>();
         this.placedBlocks = new HashSet<>();
         this.players = new EnumMap<>(Team.class);
@@ -87,10 +92,14 @@ public class Arena extends BukkitRunnable {
         if (players.size() == 2) {
             timer = plugin.<Integer>getOption(Option.START_COUNTDOWN);
         }
+
+        scoreboardManager.createScoreboard(user);
     }
 
     public void removePlayer(User user) {
         players.remove(user.getTeam());
+
+        scoreboardManager.removeScoreboard(user);
     }
 
     public List<User> getPlayers() {
@@ -145,6 +154,10 @@ public class Arena extends BukkitRunnable {
         this.timer = timer;
     }
 
+    public ScoreboardManager getScoreboardManager() {
+        return scoreboardManager;
+    }
+
     public void start() {
         if (started) {
             return;
@@ -173,8 +186,10 @@ public class Arena extends BukkitRunnable {
             winner.sendRawMessage("You win, the other player has quit the game!");
             winner.addStat(StatisticType.GAMES_PLAYED, 1);
             winner.addStat(StatisticType.WIN, 1);
+            winner.addStat(StatisticType.WIN_STREAK, 1);
 
             loser.addStat(StatisticType.LOSE, 1);
+            loser.setStat(StatisticType.WIN_STREAK, 0);
         }
 
         plugin.getUserManager().removeUser(loser.getUniqueId());
@@ -230,7 +245,10 @@ public class Arena extends BukkitRunnable {
         if (score == pointsToWin) {
             User loser = players.values().stream().filter(user -> !user.getName().equals(scorer.getName())).findFirst().orElse(null);
             loser.addStat(StatisticType.LOSE, 1);
+            loser.setStat(StatisticType.WIN_STREAK, 0);
+
             scorer.addStat(StatisticType.WIN, 1);
+            scorer.addStat(StatisticType.WIN_STREAK, 1);
 
             List<String> summaryMessages = chatManager.getSummaryMessage(scorer, loser);
 
@@ -305,7 +323,7 @@ public class Arena extends BukkitRunnable {
     }
 
     public void handleDeath(User victim, User killer) {
-        killer.addStat(StatisticType.KILL, 1);
+        killer.addStat(StatisticType.LOCAL_KILL, 1);
 
         String killerName = chatManager.getTeamColoredName(killer);
         String victimName = chatManager.getTeamColoredName(victim);
@@ -314,7 +332,7 @@ public class Arena extends BukkitRunnable {
             user.sendFormattedMessage("game-messages.killed-by", victimName, killerName);
         }
 
-        victim.addStat(StatisticType.DEATH, 1);
+        victim.addStat(StatisticType.LOCAL_DEATH, 1);
 
         resetPlayerPosition(victim);
     }
@@ -430,7 +448,7 @@ public class Arena extends BukkitRunnable {
 
                         broadcastMessage("game-messages.fell-into-void", chatManager.getTeamColoredName(user));
 
-                        user.addStat(StatisticType.DEATH, 1);
+                        user.addStat(StatisticType.LOCAL_DEATH, 1);
                     }
                 }
             }
@@ -446,9 +464,13 @@ public class Arena extends BukkitRunnable {
                     player.getInventory().setArmorContents(null);
                     player.teleport(this.getLocation(GameLocation.END));
 
+                    scoreboardManager.removeScoreboard(user);
+
                     InventorySerializer.loadInventory(plugin, player);
 
                     user.addStat(StatisticType.GAMES_PLAYED, 1);
+                    user.addStat(StatisticType.KILL, user.getStat(StatisticType.LOCAL_KILL));
+                    user.addStat(StatisticType.DEATH, user.getStat(StatisticType.DEATH));
                 }
 
                 setArenaState(ArenaState.RESTARTING);
