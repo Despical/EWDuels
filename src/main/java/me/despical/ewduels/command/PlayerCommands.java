@@ -2,7 +2,12 @@ package me.despical.ewduels.command;
 
 import me.despical.commandframework.CommandArguments;
 import me.despical.commandframework.annotations.Command;
+import me.despical.commandframework.annotations.Completer;
 import me.despical.ewduels.user.User;
+import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Despical
@@ -36,5 +41,28 @@ public class PlayerCommands extends AbstractCommandHandler {
     )
     public void leave(User user) {
         plugin.getArenaManager().leaveQueue(user);
+    }
+
+    @Completer(
+        name = "ew"
+    )
+    public List<String> tabCompletion(CommandArguments arguments) {
+        List<String> emptyList = new ArrayList<>();
+
+        if (arguments.isArgumentsEmpty()) {
+            return null;
+        }
+
+        String arg = arguments.getArgument(0);
+
+        if (!arguments.hasPermission("ew.tabcompleter")) {
+            return StringUtil.copyPartialMatches(arg, List.of("join", "leave"), emptyList);
+        }
+
+        if ("delete".equals(arg) || "edit".equals(arg)) {
+            return StringUtil.copyPartialMatches(arg, List.copyOf(plugin.getArenaRegistry().getArenaIds()), emptyList);
+        }
+
+        return StringUtil.copyPartialMatches(arg, List.of("create", "delete", "list", "edit", "join", "leave"), emptyList);
     }
 }
