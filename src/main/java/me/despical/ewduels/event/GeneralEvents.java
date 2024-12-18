@@ -13,7 +13,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -37,6 +36,11 @@ public class GeneralEvents extends AbstractEventHandler {
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
                 player.teleport(arena.getLocation(GameLocation.END));
 
+                teleportToEnd.remove(player.getUniqueId());
+
+                player.getInventory().clear();
+                player.getInventory().setArmorContents(null);
+
                 InventorySerializer.loadInventory(plugin, player);
             }, 1L);
         }
@@ -45,11 +49,15 @@ public class GeneralEvents extends AbstractEventHandler {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent event) {
         handleQuit(event.getPlayer());
+
+        event.setQuitMessage(null);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onKick(PlayerKickEvent event) {
         handleQuit(event.getPlayer());
+
+        event.setLeaveMessage(null);
     }
 
     private void handleQuit(Player player) {

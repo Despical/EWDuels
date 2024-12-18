@@ -113,7 +113,7 @@ public class ChatManager {
     }
 
     public String getColoredScore(Arena arena, Team team) {
-        return this.getTeamColor(team) + "&l" + arena.getPlayer(team).getStat(StatisticType.LOCAL_SCORE);
+        return this.getTeamColor(team) + "&l" + arena.getScore(team);
     }
 
     public String getListElement(String path, int position) {
@@ -137,12 +137,12 @@ public class ChatManager {
             .map(msg -> {
                 msg = msg.replace("%formatted_time%", StringFormatUtils.formatIntoMMSS(arena.getRoundTimer()));
                 msg = msg.replace("%winner_name%", winner.getName());
-                msg = msg.replace("%winner_score%", Integer.toString(winner.getStat(StatisticType.LOCAL_SCORE)));
+                msg = msg.replace("%winner_score%", Integer.toString(arena.getScore(winner.getTeam())));
                 msg = msg.replace("%winner_damage%", Integer.toString(winner.getStat(StatisticType.LOCAL_DAMAGE) / 2));
                 msg = msg.replace("%winner_placed_blocks%", Integer.toString(winner.getStat(StatisticType.LOCAL_PLACED_BLOCKS)));
 
                 msg = msg.replace("%loser_name%", loser.getName());
-                msg = msg.replace("%loser_score%", Integer.toString(loser.getStat(StatisticType.LOCAL_SCORE)));
+                msg = msg.replace("%loser_score%", Integer.toString(arena.getScore(loser.getTeam())));
                 msg = msg.replace("%loser_damage%", Integer.toString(loser.getStat(StatisticType.LOCAL_DAMAGE) / 2));
                 msg = msg.replace("%loser_placed_blocks%", Integer.toString(loser.getStat(StatisticType.LOCAL_PLACED_BLOCKS)));
                 return msg;

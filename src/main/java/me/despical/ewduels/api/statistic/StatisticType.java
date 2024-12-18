@@ -13,7 +13,6 @@ public enum StatisticType {
     DEATH("death"),
     GAMES_PLAYED("gamesplayed"),
     WIN_STREAK("winstreak"),
-    LOCAL_SCORE,
     LOCAL_DAMAGE,
     LOCAL_KILL,
     LOCAL_DEATH,

@@ -29,6 +29,7 @@ queue-messages:
   already-in-queue: "&cYou are already in a queue for a EW Duels match."
 
 game-messages:
+  left-the-match: "{0} &7disconnected."
   starts-in-5-and-less: "&eThe game starts in &c{0} &esecond{1}!"
   fell-into-void: "{0} &7fell into the void!"
   killed-by: "{0} &7was killed by {1}&7."
@@ -62,7 +63,7 @@ game-messages:
     - "&a%winner_name% &e&lWINNER! &a%loser_name%"
     - ""
     - "&a%winner_score% &7- &f&lGoals &7- &a%loser_score%"
-    - "&a%winner_damage% &7- &f&lDamage Dealt &7- &a%loser_damage%"
+    - "&a%winner_damage%&c❤ &7- &f&lDamage Dealt &7- &a%loser_damage%&c❤"
     - "&a%winner_placed_blocks% &7- &f&lBlocks Placed &7- &a%loser_placed_blocks%"
     - ""
     - "%no_center%&6&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"

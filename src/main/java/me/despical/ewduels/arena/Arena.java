@@ -16,17 +16,17 @@ import me.despical.ewduels.user.User;
 import me.despical.ewduels.util.GameLocation;
 import me.despical.ewduels.util.Utils;
 import me.despical.fileitems.SpecialItem;
-import org.bukkit.Color;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Bat;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
 
 /**
  * @author Despical
@@ -42,11 +42,10 @@ public class Arena extends BukkitRunnable {
     private final ScoreboardManager scoreboardManager;
     private final Set<Bat> vehicles;
     private final Set<Block> placedBlocks;
-    private final Map<Team, User> players;
+    private final Map<Team, TeamData> teams;
     private final Map<GameLocation, Location> locations;
 
-    private int timer;
-    private int roundTimer;
+    private int timer, roundTimer;
     private boolean ready;
     private boolean started;
     private User lastScoredPlayer;
@@ -58,7 +57,7 @@ public class Arena extends BukkitRunnable {
         this.scoreboardManager = new ScoreboardManager(plugin, this);
         this.vehicles = new HashSet<>();
         this.placedBlocks = new HashSet<>();
-        this.players = new EnumMap<>(Team.class);
+        this.teams = new EnumMap<>(Team.class);
         this.locations = new EnumMap<>(GameLocation.class);
     }
 
@@ -82,14 +81,45 @@ public class Arena extends BukkitRunnable {
         this.arenaState = arenaState;
     }
 
-    public boolean isArenaState(ArenaState arenaState) {
-        return this.arenaState == arenaState;
+    public boolean isArenaState(ArenaState arenaState, ArenaState... arenaStates) {
+        if (this.arenaState == arenaState) return true;
+
+        for (ArenaState state : arenaStates) {
+            if (this.arenaState == state) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private Team getRandomAvailableTeam() {
+        int random = ThreadLocalRandom.current().nextInt(2);
+        Team team = Team.values()[random];
+
+        if (!teams.containsKey(team)) {
+            return team;
+        }
+
+        TeamData teamData = teams.get(team);
+
+        if (teamData.hasQuit()) {
+            return team;
+        }
+
+        return team.getOpposite();
     }
 
     public void addPlayer(User user) {
-        players.put(user.getTeam(), user);
+        Team team = getRandomAvailableTeam();
+        user.setTeam(team);
 
-        if (players.size() == 2) {
+        TeamData teamData = new TeamData(team);
+        teamData.setUser(user);
+
+        teams.put(team, teamData);
+
+        if (getPlayers().size() == 2) {
             timer = plugin.<Integer>getOption(Option.START_COUNTDOWN);
         }
 
@@ -97,24 +127,26 @@ public class Arena extends BukkitRunnable {
     }
 
     public void removePlayer(User user) {
-        players.remove(user.getTeam());
+        teams.get(user.getTeam()).setQuit(true);
 
         scoreboardManager.removeScoreboard(user);
     }
 
     public List<User> getPlayers() {
-        return players.values()
+        return teams.values()
             .stream()
-            .filter(user -> user.getPlayer() != null)
+            .filter(TeamData::isUserOnline)
+            .filter(Predicate.not(TeamData::hasQuit))
+            .map(TeamData::getUser)
             .toList();
     }
 
     public User getPlayer(Team team) {
-        return players.get(team);
+        return teams.get(team).getUser();
     }
 
     public boolean isInArena(User user) {
-        return players.containsValue(user);
+        return getPlayers().stream().anyMatch(user::equals);
     }
 
     public void setLocation(GameLocation gameLocation, Location location) {
@@ -154,6 +186,14 @@ public class Arena extends BukkitRunnable {
         this.timer = timer;
     }
 
+    public void addScore(Team team) {
+        teams.get(team).addScore();
+    }
+
+    public int getScore(Team team) {
+        return teams.get(team).getScore();
+    }
+
     public ScoreboardManager getScoreboardManager() {
         return scoreboardManager;
     }
@@ -178,21 +218,86 @@ public class Arena extends BukkitRunnable {
     }
 
     public void handleQuit(User loser) {
-        players.remove(loser.getTeam());
-
-        if (players.size() == 1) {
-            User winner = players.get(0);
-
-            winner.sendRawMessage("You win, the other player has quit the game!");
-            winner.addStat(StatisticType.GAMES_PLAYED, 1);
-            winner.addStat(StatisticType.WIN, 1);
-            winner.addStat(StatisticType.WIN_STREAK, 1);
-
-            loser.addStat(StatisticType.LOSE, 1);
-            loser.setStat(StatisticType.WIN_STREAK, 0);
+        if (getPlayers().size() - 1 == 1) {
+            endTheGameFor(loser);
         }
 
+        teams.get(loser.getTeam()).setQuit(true);
+
         plugin.getUserManager().removeUser(loser.getUniqueId());
+    }
+
+    private void removeUser(User user) {
+        Player player = user.getPlayer();
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(null);
+        player.teleport(this.getLocation(GameLocation.END));
+
+        InventorySerializer.loadInventory(plugin, player);
+
+        scoreboardManager.removeScoreboard(user);
+
+        user.addStat(StatisticType.GAMES_PLAYED, 1);
+        user.addStat(StatisticType.KILL, user.getStat(StatisticType.LOCAL_KILL));
+        user.addStat(StatisticType.DEATH, user.getStat(StatisticType.LOCAL_DEATH));
+    }
+
+    public void handleLeave(User user) {
+        destroyVehicles();
+
+        if (arenaState == ArenaState.ENDING) {
+            if (timer > 0) {
+                removePlayer(user);
+            }
+
+            return;
+        }
+
+        if (arenaState != ArenaState.IN_GAME) {
+            return;
+        }
+
+        Player player = user.getPlayer();
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(null);
+        player.teleport(this.getLocation(GameLocation.END));
+
+        InventorySerializer.loadInventory(plugin, player);
+
+        scoreboardManager.removeScoreboard(user);
+
+        int size = this.getPlayers().size() - 1;
+
+        if (size == 1) {
+            endTheGameFor(user);
+        }
+
+        teams.get(user.getTeam()).setQuit(true);
+
+        plugin.getUserManager().removeUser(user.getUniqueId());
+    }
+
+    private void endTheGameFor(User user) {
+        setArenaState(ArenaState.ENDING);
+        destroyVehicles();
+
+        timer = plugin.<Integer>getOption(Option.ENDING_COUNTDOWN);
+
+        User winner = getOpponent(user);
+        winner.sendFormattedMessage("game-messages.left-the-match", chatManager.getTeamColoredName(user));
+        winner.addStat(StatisticType.WIN, 1);
+        winner.addStat(StatisticType.WIN_STREAK, 1);
+
+        user.addStat(StatisticType.LOSE, 1);
+        user.setStat(StatisticType.WIN_STREAK, 0);
+
+        Player winnerPlayer = winner.getPlayer();
+
+        Titles.sendTitle(winnerPlayer, 5, 60, 5, chatManager.getFormattedMessage("titles.win.title", chatManager.getTeamNameBold(winner)), chatManager.getMessage("titles.win.subtitle"));
+
+        for (String message : chatManager.getSummaryMessage(winner, user)) {
+            MiscUtils.sendCenteredMessage(winnerPlayer, message);
+        }
     }
 
     public void handlePlacingBlocks(Block block) {
@@ -209,20 +314,24 @@ public class Arena extends BukkitRunnable {
     }
 
     public void handleNewPoint(User scorer) {
+        if (arenaState != ArenaState.IN_GAME) {
+            return;
+        }
+
         lastScoredPlayer = scorer;
 
-        List<String> newRoundMessages = chatManager.getStringList("game-messages.new-round");
-
-        Player scorerPlayer = scorer.getPlayer();
-        scorer.addStat(StatisticType.LOCAL_SCORE, 1);
+        this.addScore(scorer.getTeam());
 
         restoreTheMap();
 
-        int score = scorer.getStat(StatisticType.LOCAL_SCORE);
+        int score = this.getScore(scorer.getTeam());
         String blueScore = chatManager.getColoredScore(this, Team.BLUE);
         String redScore = chatManager.getColoredScore(this, Team.RED);
 
-        for (User user : players.values()) {
+        Player scorerPlayer = scorer.getPlayer();
+        List<String> newRoundMessages = chatManager.getStringList("game-messages.new-round");
+
+        for (User user : getPlayers()) {
             teleportToStart(user);
             giveKit(user);
 
@@ -243,7 +352,8 @@ public class Arena extends BukkitRunnable {
         String winnerTeamName = chatManager.getTeamNameBold(scorer);
 
         if (score == pointsToWin) {
-            User loser = players.values().stream().filter(user -> !user.getName().equals(scorer.getName())).findFirst().orElse(null);
+            List<User> players = this.getPlayers();
+            User loser = players.stream().filter(user -> !user.getName().equals(scorer.getName())).findFirst().orElse(null);
             loser.addStat(StatisticType.LOSE, 1);
             loser.setStat(StatisticType.WIN_STREAK, 0);
 
@@ -252,14 +362,11 @@ public class Arena extends BukkitRunnable {
 
             List<String> summaryMessages = chatManager.getSummaryMessage(scorer, loser);
 
-            for (User user : players.values()) {
+            for (User user : players) {
                 Player player = user.getPlayer();
+                String titlePath = user.equals(scorer) ? "win" : "lose";
 
-                if (user.equals(scorer)) {
-                    Titles.sendTitle(player, 5, 50, 5, chatManager.getFormattedMessage("titles.win.title", winnerTeamName), chatManager.getMessage("titles.win.subtitle"));
-                } else {
-                    Titles.sendTitle(player, 5, 50, 5, chatManager.getFormattedMessage("titles.lose.title", winnerTeamName), chatManager.getMessage("titles.lose.subtitle"));
-                }
+                Titles.sendTitle(player, 5, 60, 5, chatManager.getFormattedMessage("titles.%s.title".formatted(titlePath), winnerTeamName), chatManager.getMessage("titles.%s.subtitle".formatted(titlePath)));
 
                 summaryMessages.forEach(message -> MiscUtils.sendCenteredMessage(player, message));
             }
@@ -296,7 +403,7 @@ public class Arena extends BukkitRunnable {
     }
 
     private void createVehicles() {
-        for (User user : players.values()) {
+        for (User user : this.getPlayers()) {
             Location location = this.getLocation(user.getTeam().getStartLocation());
             Bat bat = location.getWorld().spawn(location, Bat.class);
             bat.addPotionEffect(XPotion.INVISIBILITY.buildInvisible(Integer.MAX_VALUE, 1));
@@ -319,7 +426,7 @@ public class Arena extends BukkitRunnable {
     }
 
     public void broadcastMessage(String path, Object... params) {
-        players.values().forEach(user -> user.sendFormattedMessage(path, params));
+        this.getPlayers().forEach(user -> user.sendFormattedMessage(path, params));
     }
 
     public void handleDeath(User victim, User killer) {
@@ -328,7 +435,7 @@ public class Arena extends BukkitRunnable {
         String killerName = chatManager.getTeamColoredName(killer);
         String victimName = chatManager.getTeamColoredName(victim);
 
-        for (User user : players.values()) {
+        for (User user : this.getPlayers()) {
             user.sendFormattedMessage("game-messages.killed-by", victimName, killerName);
         }
 
@@ -350,25 +457,27 @@ public class Arena extends BukkitRunnable {
     }
 
     public User getOpponent(User user) {
-        if (players.size() != 2 || !players.containsValue(user)) {
+        if (getPlayers().size() != 2 || !isInArena(user)) {
             return null;
         }
 
-        return players.get(user.getTeam().getOpposite());
+        return teams.get(user.getTeam().getOpposite()).getUser();
     }
 
     @Override
     public void run() {
-        int playerSize = players.size();
+        int playerSize = getPlayers().size();
 
         if (playerSize == 0 && arenaState == ArenaState.WAITING) {
             return;
         }
 
+        List<User> players = this.getPlayers();
+
         switch (arenaState) {
             case WAITING -> {
                 if (playerSize < 2) {
-                    for (User user : players.values()) {
+                    for (User user : players) {
                         ActionBar.sendActionBar(user.getPlayer(), chatManager.getMessage("queue-messages.action-bar"));
                     }
 
@@ -376,7 +485,7 @@ public class Arena extends BukkitRunnable {
                 }
 
                 if (timer > 0) {
-                    for (User user : players.values()) {
+                    for (User user : players) {
                         user.sendFormattedMessage("game-messages.starts-in-5-and-less", timer, timer != 1 ? "s" : "");
 
                         Titles.sendTitle(user.getPlayer(), 5, 22, 5, chatManager.getListElement("titles.starts-in-5-and-less.title", 5 - timer), chatManager.getListElement("titles.starts-in-5-and-less.subtitle", 5 - timer));
@@ -391,7 +500,7 @@ public class Arena extends BukkitRunnable {
             case STARTING -> {
                 List<String> gameExplanation = chatManager.getStringList("game-messages.explanation");
 
-                for (User user : players.values()) {
+                for (User user : players) {
                     Player player = user.getPlayer();
 
                     if (player == null) {
@@ -427,12 +536,11 @@ public class Arena extends BukkitRunnable {
                     if (timer == 0) {
                         destroyVehicles();
                     } else {
-                        for (User user : players.values()) {
+                        for (User user : players) {
                             Player player = user.getPlayer();
 
                             Titles.sendTitle(player, 0, 25, 2, chatManager.getFormattedMessage("titles.new-score.title", chatManager.getTeamColoredName(lastScoredPlayer)), chatManager.getFormattedMessage("titles.new-score.subtitle", timer));
                         }
-
                     }
 
                     timer--;
@@ -440,7 +548,7 @@ public class Arena extends BukkitRunnable {
 
                 int y = plugin.<Integer>getOption(Option.SEND_TO_THE_START_POS_Y);
 
-                for (User user : players.values()) {
+                for (User user : players) {
                     Player player = user.getPlayer();
 
                     if (player.getLocation().getBlockY() < y) {
@@ -458,27 +566,22 @@ public class Arena extends BukkitRunnable {
                     return;
                 }
 
-                for (User user : players.values()) {
-                    Player player = user.getPlayer();
-                    player.getInventory().clear();
-                    player.getInventory().setArmorContents(null);
-                    player.teleport(this.getLocation(GameLocation.END));
+                restoreTheMap();
 
-                    scoreboardManager.removeScoreboard(user);
-
-                    InventorySerializer.loadInventory(plugin, player);
-
-                    user.addStat(StatisticType.GAMES_PLAYED, 1);
-                    user.addStat(StatisticType.KILL, user.getStat(StatisticType.LOCAL_KILL));
-                    user.addStat(StatisticType.DEATH, user.getStat(StatisticType.DEATH));
+                for (User user : players) {
+                    removeUser(user);
                 }
 
                 setArenaState(ArenaState.RESTARTING);
-                restoreTheMap();
             }
 
             case RESTARTING -> {
-                players.clear();
+                teams.clear();
+
+                vehicles.forEach(Entity::remove);
+                vehicles.clear();
+
+                setArenaState(ArenaState.WAITING);
             }
         }
     }

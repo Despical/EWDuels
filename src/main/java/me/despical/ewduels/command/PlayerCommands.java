@@ -3,6 +3,8 @@ package me.despical.ewduels.command;
 import me.despical.commandframework.CommandArguments;
 import me.despical.commandframework.annotations.Command;
 import me.despical.commandframework.annotations.Completer;
+import me.despical.ewduels.arena.Arena;
+import me.despical.ewduels.arena.ArenaState;
 import me.despical.ewduels.user.User;
 import org.bukkit.util.StringUtil;
 
@@ -40,6 +42,13 @@ public class PlayerCommands extends AbstractCommandHandler {
         senderType = Command.SenderType.PLAYER
     )
     public void leave(User user) {
+        Arena arena = user.getArena();
+
+        if (arena != null && arena.isArenaState(ArenaState.IN_GAME)) {
+            arena.handleLeave(user);
+            return;
+        }
+
         plugin.getArenaManager().leaveQueue(user);
     }
 
@@ -60,7 +69,7 @@ public class PlayerCommands extends AbstractCommandHandler {
         }
 
         if ("delete".equals(arg) || "edit".equals(arg)) {
-            return StringUtil.copyPartialMatches(arg, List.copyOf(plugin.getArenaRegistry().getArenaIds()), emptyList);
+            return StringUtil.copyPartialMatches(arg, plugin.getArenaRegistry().getArenaIds(), emptyList);
         }
 
         return StringUtil.copyPartialMatches(arg, List.of("create", "delete", "list", "edit", "join", "leave"), emptyList);

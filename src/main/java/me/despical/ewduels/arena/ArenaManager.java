@@ -25,6 +25,11 @@ public class ArenaManager {
     }
 
     public void joinQueue(User user) {
+        if (queuePlayer == null && user.getArena() != null) {
+            user.sendMessage("queue-messages.already-in-queue");
+            return;
+        }
+
         if (user.equals(queuePlayer)) {
             user.sendMessage("queue-messages.already-in-queue");
             return;
@@ -63,7 +68,6 @@ public class ArenaManager {
         if (queuePlayer != null) {
             queuePlayer.sendMessage("queue-messages.opponent-found");
             user.sendMessage("queue-messages.player-two-match-starting");
-            user.setTeam(Team.BLUE);
 
             arena.addPlayer(user);
 
@@ -74,13 +78,11 @@ public class ArenaManager {
         queuePlayer = user;
         queuePlayer.sendMessage("queue-messages.joined");
 
-        user.setTeam(Team.RED);
-
         arena.addPlayer(user);
     }
 
     public void leaveQueue(User user) {
-        Arena arena = plugin.getArenaRegistry().getArena(user);
+        Arena arena = user.getArena();
 
         if (arena == null) {
             user.sendMessage("queue-messages.not-in-queue");

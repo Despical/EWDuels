@@ -107,10 +107,10 @@ public class ScoreboardManager {
         line = line.replace("%players%", Integer.toString(arena.getPlayers().size()));
         line = line.replace("%kills%", Integer.toString(user.getStat(StatisticType.LOCAL_KILL)));
         line = line.replace("%deaths%", Integer.toString(user.getStat(StatisticType.LOCAL_DEATH)));
-        line = line.replace("%score%", Integer.toString(user.getStat(StatisticType.LOCAL_SCORE)));
+        line = line.replace("%score%", Integer.toString(arena.getScore(user.getTeam())));
         line = line.replace("%win_streak%", Integer.toString(user.getStat(StatisticType.WIN_STREAK)));
 
-        if (arena.isArenaState(ArenaState.IN_GAME)) {
+        if (arena.isArenaState(ArenaState.IN_GAME, ArenaState.ENDING)) {
             line = line.replace("%blue_score%", getFormattedScore(Team.BLUE));
             line = line.replace("%red_score%", getFormattedScore(Team.RED));
         }
@@ -119,16 +119,10 @@ public class ScoreboardManager {
     }
 
     private String getFormattedScore(Team team) {
-        User user = arena.getPlayer(team);
-
-        if (user == null) {
-            return ""; // FIXME - If a player quits mid-game it will throw an exception
-        }
-
-        int score = user.getStat(StatisticType.LOCAL_SCORE);
+        int score = arena.getScore(team);
         int targetScore = plugin.<Integer>getOption(Option.POINTS_TO_WIN);
-        String color = chatManager.getTeamColor(team);
 
+        String color = chatManager.getTeamColor(team);
         StringBuilder result = new StringBuilder();
 
         for (int i = 1; i <= targetScore; i++) {

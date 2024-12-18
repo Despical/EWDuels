@@ -44,7 +44,8 @@ public class ArenaRegistry {
 
     public Arena getRandomAvailableArena() {
         List<Arena> currentArenas = arenas.values().stream()
-            .filter(arena -> arena.isReady() && !arena.isSetupMode() && arena.getPlayers().size() < 2)
+            .filter(arena -> arena.isReady() && !arena.isSetupMode())
+            .filter(arena -> arena.isArenaState(ArenaState.WAITING) && arena.getPlayers().size() < 2)
             .collect(Collectors.toList());
 
         Collections.shuffle(currentArenas);
@@ -63,8 +64,8 @@ public class ArenaRegistry {
         return Set.copyOf(arenas.values());
     }
 
-    public Set<String> getArenaIds() {
-        return Set.copyOf(arenas.keySet());
+    public List<String> getArenaIds() {
+        return List.copyOf(arenas.keySet());
     }
 
     public Arena registerNewArena(String id) {

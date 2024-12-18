@@ -9,6 +9,7 @@ import me.despical.ewduels.user.User;
 import me.despical.fileitems.SpecialItem;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -34,7 +35,7 @@ public class InGameEvents extends AbstractEventHandler {
         User user = plugin.getUserManager().getUser(event.getPlayer());
         Arena arena = user.getArena();
 
-        if (arena == null || !arena.isArenaState(ArenaState.IN_GAME)) {
+        if (arena == null) {
             return;
         }
 
@@ -102,11 +103,6 @@ public class InGameEvents extends AbstractEventHandler {
     @EventHandler
     public void onLeaveQueue(PlayerInteractEvent event) {
         User user = plugin.getUserManager().getUser(event.getPlayer());
-
-        if (user.getArena() == null) {
-            return;
-        }
-
         SpecialItem item = plugin.getItemManager().getItem("leave-queue");
 
         if (!item.equals(event.getItem())) {
@@ -148,8 +144,19 @@ public class InGameEvents extends AbstractEventHandler {
 
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Player damagerPlayer)) return;
         if (!(event.getEntity() instanceof Player victimPlayer)) return;
+
+        Player damagerPlayer = null;
+
+        if (event.getDamager() instanceof Player player) {
+            damagerPlayer = player;
+        }
+
+        if (event.getDamager() instanceof Arrow arrow && arrow.getShooter() instanceof Player shooter) {
+            damagerPlayer = shooter;
+        }
+
+        if (damagerPlayer == null) return;
 
         User damager = plugin.getUserManager().getUser(damagerPlayer);
         User victim = plugin.getUserManager().getUser(victimPlayer);
