@@ -63,7 +63,9 @@ public class ScoreboardManager {
             }
         });
 
+        scoreboard.disableAutoUpdate();
         scoreboard.activate();
+        scoreboard.update();
         scoreboards.put(user, scoreboard);
     }
 
@@ -81,6 +83,10 @@ public class ScoreboardManager {
 
             scoreboards.remove(user);
         }
+    }
+
+    public void updateScoreboards() {
+        scoreboards.values().forEach(Scoreboard::update);
     }
 
     private List<Entry> formatScoreboard(Player player) {

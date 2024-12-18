@@ -226,7 +226,7 @@ public class InGameEvents extends AbstractEventHandler {
         User user = plugin.getUserManager().getUser(player);
         Arena arena = user.getArena();
 
-        if (arena != null && arena.isArenaState(ArenaState.IN_GAME)) {
+        if (arena != null) {
             event.setCancelled(true);
         }
     }

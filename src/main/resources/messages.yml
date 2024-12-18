@@ -27,6 +27,7 @@ queue-messages:
   not-in-queue: "&cYou are already not in a queue!"
   no-arena-available: "&cThere aren't any available arena at the moment."
   already-in-queue: "&cYou are already in a queue for a EW Duels match."
+  can-not-leave-now: "&cYou can not leave the queue while the game is starting!"
 
 game-messages:
   left-the-match: "{0} &7disconnected."

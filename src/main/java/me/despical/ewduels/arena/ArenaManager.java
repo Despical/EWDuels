@@ -7,6 +7,7 @@ import me.despical.ewduels.option.Option;
 import me.despical.ewduels.user.User;
 import me.despical.ewduels.util.GameLocation;
 import me.despical.fileitems.SpecialItem;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 /**
@@ -52,6 +53,7 @@ public class ArenaManager {
         }
 
         player.setFoodLevel(20);
+        player.setGameMode(GameMode.ADVENTURE);
 
         AttributeUtils.healPlayer(player);
 
