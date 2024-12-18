@@ -48,6 +48,7 @@ public class Arena extends BukkitRunnable {
     private int timer, roundTimer;
     private boolean ready;
     private boolean started;
+    private String mapName;
     private User lastScoredPlayer;
     private SetupMode setupMode;
     private ArenaState arenaState = ArenaState.INACTIVE;
@@ -184,6 +185,14 @@ public class Arena extends BukkitRunnable {
 
     public void setTimer(int timer) {
         this.timer = timer;
+    }
+
+    public String getMapName() {
+        return mapName;
+    }
+
+    public void setMapName(String mapName) {
+        this.mapName = mapName;
     }
 
     public void addScore(Team team) {

@@ -18,7 +18,7 @@ public enum StatisticType {
     LOCAL_DEATH,
     LOCAL_PLACED_BLOCKS;
 
-    public static final StatisticType[] PERSISTENT_STATS = {};
+    public static final StatisticType[] PERSISTENT_STATS = {WIN, LOSE, KILL, DEATH, GAMES_PLAYED, WIN_STREAK};
 
     private final String name;
     private final boolean persistent;
@@ -39,5 +39,15 @@ public enum StatisticType {
 
     public boolean isPersistent() {
         return persistent;
+    }
+
+    public static StatisticType matchType(String name) {
+        for (StatisticType type : PERSISTENT_STATS) {
+            if (type.name.equals(name)) {
+                return type;
+            }
+        }
+
+        return null;
     }
 }

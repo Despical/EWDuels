@@ -36,8 +36,6 @@ public class ChatManager {
         this.cachedMessages = new HashMap<>();
 
         reload();
-
-        Stream.of(ArenaState.values()).forEach(arenaState -> arenaState.setFormattedName(this.getMessage(arenaState.getPath())));
     }
 
     public void reload() {
@@ -46,6 +44,8 @@ public class ChatManager {
 
         StringFormatUtils.setTimeFormat(this.getMessage("scoreboard.placeholders.timer-format"));
         StringFormatUtils.setDateFormat(this.getMessage("scoreboard.placeholders.date-format"));
+        Stream.of(ArenaState.values()).forEach(arenaState -> arenaState.setFormattedName(this.getMessage(arenaState.getPath())));
+
     }
 
     public String getBreak(int score) {

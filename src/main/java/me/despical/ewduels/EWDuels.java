@@ -12,6 +12,7 @@ import me.despical.ewduels.command.PlayerCommands;
 import me.despical.ewduels.event.GeneralEvents;
 import me.despical.ewduels.event.InGameEvents;
 import me.despical.ewduels.handler.chat.ChatManager;
+import me.despical.ewduels.handler.papi.PlaceholderManager;
 import me.despical.ewduels.option.ConfigOptions;
 import me.despical.ewduels.option.Option;
 import me.despical.ewduels.user.User;
@@ -54,6 +55,10 @@ public class EWDuels extends JavaPlugin {
         itemManager.registerItems("items", "queue-items");
         itemManager.registerItems("ewduels-kit", "kit", ConfigUtils.getConfig(this, "items"));
         commandFramework = new CommandFramework(this);
+
+        if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            new PlaceholderManager(this);
+        }
 
         new GeneralEvents();
         new InGameEvents();
