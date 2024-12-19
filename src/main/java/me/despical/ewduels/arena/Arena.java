@@ -389,7 +389,7 @@ public class Arena extends BukkitRunnable {
                 MiscUtils.sendCenteredMessage(player, message);
             }
         }
-//
+
         boolean win = score == plugin.<Integer>getOption(Option.POINTS_TO_WIN);
         int countdown = plugin.<Integer>getOption(Option.ROUND_STARTING_COUNTDOWN);
 

@@ -1,3 +1,6 @@
+* Fireworks on both at the end and at the round ends.
+* Send titles if there is no round start countdown.
+* Update Commons.
 * ~~Handle players quitting mid-game.~~
 * ~~Add PAPI placeholders.~~
 * ~~Better main command messages.~~
