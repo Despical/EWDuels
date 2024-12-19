@@ -111,6 +111,7 @@ public class ArenaRegistry {
 
             Arena arena = new Arena(id);
             arena.setReady(config.getBoolean(path + "ready"));
+            arena.setMapName(config.getString(path + "mapName"));
 
             if (arena.isReady()) {
                 arena.start();
@@ -148,5 +149,6 @@ public class ArenaRegistry {
         }
 
         config.set(path + "ready", arena.isReady());
+        config.set(path + "mapName", arena.getMapName());
     }
 }

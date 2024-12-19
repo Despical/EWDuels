@@ -127,22 +127,23 @@ public class PlayerCommands extends AbstractCommandHandler {
     )
     public List<String> tabCompletion(CommandArguments arguments) {
         List<String> emptyList = new ArrayList<>();
-
-        if (arguments.getLength() != 1) {
-            return emptyList;
-        }
-
         String arg = arguments.getArgument(0);
 
         if (!arguments.hasPermission("ew.tabcompleter")) {
             return StringUtil.copyPartialMatches(arg, List.of("join", "leave"), emptyList);
         }
 
-        if ("delete".equals(arg) || "edit".equals(arg)) {
-            return StringUtil.copyPartialMatches(arg, plugin.getArenaRegistry().getArenaIds(), emptyList);
+        if (arguments.getLength() == 2) {
+            if ("delete".equals(arg) || "edit".equals(arg)) {
+                return StringUtil.copyPartialMatches(arguments.getArgument(1), plugin.getArenaRegistry().getArenaIds(), emptyList);
+            }
         }
 
-        return StringUtil.copyPartialMatches(arg, List.of("create", "delete", "list", "edit", "join", "leave", "help"), emptyList);
+        if (arguments.getLength() == 1) {
+            return StringUtil.copyPartialMatches(arg, List.of("create", "delete", "list", "edit", "join", "leave", "help"), emptyList);
+        }
+
+        return emptyList;
     }
 
     private String formatCommandUsage(String usage) {

@@ -109,7 +109,7 @@ public class ScoreboardManager {
         line = line.replace("%version%", "v" + plugin.getDescription().getVersion());
         line = line.replace("%timer%", Integer.toString(arena.getTimer()));
         line = line.replace("%formatted_timer%", StringFormatUtils.formatIntoMMSS(arena.getRoundTimer()));
-        line = line.replace("%map_name%", "Testinho");
+        line = line.replace("%map_name%", arena.getMapName());
         line = line.replace("%players%", Integer.toString(arena.getPlayers().size()));
         line = line.replace("%kills%", Integer.toString(user.getStat(StatisticType.LOCAL_KILL)));
         line = line.replace("%deaths%", Integer.toString(user.getStat(StatisticType.LOCAL_DEATH)));

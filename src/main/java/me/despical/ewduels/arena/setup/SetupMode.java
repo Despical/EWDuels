@@ -2,6 +2,8 @@ package me.despical.ewduels.arena.setup;
 
 import me.despical.commons.compat.XMaterial;
 import me.despical.commons.serializer.InventorySerializer;
+import me.despical.commons.util.Strings;
+import me.despical.commons.util.conversation.ConversationBuilder;
 import me.despical.ewduels.EWDuels;
 import me.despical.ewduels.arena.Arena;
 import me.despical.ewduels.user.User;
@@ -11,12 +13,16 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.conversations.ConversationContext;
+import org.bukkit.conversations.Prompt;
+import org.bukkit.conversations.StringPrompt;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,6 +56,7 @@ public class SetupMode {
         player.setAllowFlight(true);
 
         List<String> itemNames = Stream.of(GameLocation.values()).map(GameLocation::getName).collect(Collectors.toList());
+        itemNames.add("set-map-name");
         itemNames.add("save-and-exit");
 
         for (String itemName : itemNames) {
@@ -170,6 +177,42 @@ public class SetupMode {
             InventorySerializer.loadInventory(plugin, event.getPlayer());
 
             arena.endSetupSeason(false);
+        }
+
+        @EventHandler
+        public void setMapName(PlayerInteractEvent event) {
+            Player player = event.getPlayer();
+
+            if (!player.getUniqueId().equals(user.getUniqueId())) {
+                return;
+            }
+
+            SpecialItem exitItem = plugin.getItemManager().getItem("set-map-name");
+
+            if (!exitItem.equals(event.getItem())) {
+                return;
+            }
+
+            event.setCancelled(true);
+
+            new ConversationBuilder(plugin).withPrompt(new StringPrompt() {
+
+                @Override
+                @NotNull
+                public String getPromptText(@NotNull ConversationContext context) {
+                    return plugin.getChatManager().getMessage("setup.set-map-name");
+                }
+
+                @Override
+                public Prompt acceptInput(@NotNull ConversationContext context, String input) {
+                    String name = Strings.format(input);
+
+                    arena.setMapName(name);
+
+                    plugin.getServer().getScheduler().runTaskLater(plugin, () -> user.sendFormattedMessage("setup.map-name-set", arena.getId(), name), 1L);
+                    return Prompt.END_OF_CONVERSATION;
+                }
+            }).buildFor(player);
         }
     }
 }

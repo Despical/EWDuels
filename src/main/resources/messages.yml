@@ -16,6 +16,8 @@ setup:
   missing-location: "&cArena could not be registered due to missing some of the game locations ({0})."
   location-set: "&a{0} location set."
   arena-deleted: "&aExiting the setup mode because the arena is deleted."
+  set-map-name: "&ePlease type the map name of arena in the chat. You can use color codes."
+  map-name-set: "&aMap name of the arena &e{0} &ais set to &e{1}&a."
 
 queue-messages:
   action-bar: "&6You are in queue for a EW Duels match..."

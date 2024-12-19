@@ -23,6 +23,10 @@ items:
     name: "&bSet Second Egg's Location"
     material: DRAGON_EGG
     slot: 6
+  set-map-name:
+    name: "&eSet Map Name"
+    material: NAME_TAG
+    slot: 7
   save-and-exit:
     name: "&cSave and Exit"
     material: RED_WOOL
