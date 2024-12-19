@@ -17,6 +17,7 @@ import me.despical.ewduels.option.Option;
 import me.despical.ewduels.user.User;
 import org.bukkit.entity.Player;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +35,23 @@ public class ScoreboardManager {
     private final Arena arena;
     private final ChatManager chatManager;
     private final Map<User, Scoreboard> scoreboards;
+    private final Map<ArenaState, List<String>> content;
 
     public ScoreboardManager(EWDuels plugin, Arena arena) {
         this.plugin = plugin;
         this.arena = arena;
         this.chatManager = plugin.getChatManager();
         this.scoreboards = new HashMap<>();
+        this.content = new EnumMap<>(ArenaState.class);
+        this.initScoreboardContent();
+    }
+
+    private void initScoreboardContent() {
+        for (ArenaState state : ArenaState.values()) {
+            if (state == ArenaState.INACTIVE) continue;
+
+            content.put(state, chatManager.getStringList("scoreboard.content." + state.getDefaultName()));
+        }
     }
 
     public void createScoreboard(User user) {
@@ -59,7 +71,7 @@ public class ScoreboardManager {
 
             @Override
             public List<Entry> getEntries(Player player) {
-                return formatScoreboard(player);
+                return formatScoreboard(plugin.getUserManager().getUser(player));
             }
         });
 
@@ -89,13 +101,10 @@ public class ScoreboardManager {
         scoreboards.values().forEach(Scoreboard::update);
     }
 
-    private List<Entry> formatScoreboard(Player player) {
+    private List<Entry> formatScoreboard(User user) {
         EntryBuilder builder = new EntryBuilder();
-        List<String> lines = chatManager.getStringList("scoreboard.content." + arena.getArenaState().getDefaultName());
 
-        User user = plugin.getUserManager().getUser(player);
-
-        for (String line : lines) {
+        for (String line : content.get(arena.getArenaState())) {
             String formattedLine = formatScoreboardLine(line, user);
 
             builder.next(formattedLine);
