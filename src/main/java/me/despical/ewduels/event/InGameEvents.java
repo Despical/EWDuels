@@ -91,13 +91,18 @@ public class InGameEvents extends AbstractEventHandler {
         User user = plugin.getUserManager().getUser(event.getPlayer());
         Arena arena = user.getArena();
 
-        if (arena == null) {
+        if (arena == null || !arena.isArenaState(ArenaState.IN_GAME)) {
             return;
         }
 
-        if (!arena.isArenaState(ArenaState.IN_GAME) || !arena.canBreak(event.getBlock())) {
+        Block block = event.getBlock();
+
+        if (!arena.canBreak(block)) {
             event.setCancelled(true);
+            return;
         }
+
+        arena.handleBreak(block);
     }
 
     @EventHandler

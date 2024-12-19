@@ -347,6 +347,10 @@ public class Arena extends BukkitRunnable {
         return placedBlocks.contains(block);
     }
 
+    public void handleBreak(Block block) {
+        placedBlocks.remove(block);
+    }
+
     public void restoreTheMap() {
         placedBlocks.forEach(state -> state.setType(Material.AIR));
         placedBlocks.clear();
@@ -385,10 +389,11 @@ public class Arena extends BukkitRunnable {
                 MiscUtils.sendCenteredMessage(player, message);
             }
         }
-
+//
         boolean win = score == plugin.<Integer>getOption(Option.POINTS_TO_WIN);
+        int countdown = plugin.<Integer>getOption(Option.ROUND_STARTING_COUNTDOWN);
 
-        if (!win) {
+        if (!win && countdown != 0) {
             createVehicles();
         }
 
@@ -420,7 +425,7 @@ public class Arena extends BukkitRunnable {
             return;
         }
 
-        timer = plugin.<Integer>getOption(Option.ROUND_STARTING_COUNTDOWN);
+        timer = countdown;
     }
 
     private void giveKit(User user) {
